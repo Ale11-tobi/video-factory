@@ -1,0 +1,26 @@
+# Ambienti virtuali
+venv/
+env/
+.env
+
+# Cache di Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Directory temporanee e output
+temp/
+outputs/
+*.mp4
+*.wav
+*.mp3
+
+# Cartelle modelli pesanti (verranno scaricate dinamicamente)
+models/
+Wav2Lip/
+SadTalker/
+
+# Streamlit e file di sistema
+.streamlit/
+.DS_Store
+Thumbs.db
