@@ -14,8 +14,17 @@ from core.telegram_notifier import send_telegram_video
 logger = logging.getLogger(__name__)
 
 # Configurazione API Keys integrate
+import json
+def get_google_api_key():
+    try:
+        with open("config.json", "r") as f:
+            return json.load(f).get("google_api_key", "")
+    except:
+        return ""
+
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "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")
 PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "1BBVi0DC0Zt5QhQG37RirCikK7zL2OYMJhXCHmV7ncORynDfvClYMZVj")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", get_google_api_key())
 
 async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callback=None, telegram_token: str = "", telegram_chat_id: str = "") -> str:
     """Mode A: Zero-Touch Content Factory"""
@@ -24,7 +33,7 @@ async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callba
     director = SemanticDirector(api_key=GROQ_API_KEY)
     audio_engine = AudioEngine(whisper_model_size="tiny", device="cuda")
     avatar = AvatarEngine()
-    broll = BRollManager(pexels_api_key=PEXELS_API_KEY)
+    broll = BRollManager(pexels_api_key=PEXELS_API_KEY, google_api_key=GOOGLE_API_KEY)
     sound = AudioDesign()
     assembly = AssemblyEngine(mode="A", format_ratio=format_ratio)
 
@@ -44,7 +53,12 @@ async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callba
     current_time = 0.0
     for scene in director_cut.get("scenes", []):
         if scene.get("scene_type") == "b-roll":
-            broll.process_scene_broll(scene["id"], scene.get("broll_prompt"), current_time)
+            broll.process_scene_broll(
+                scene_id=scene["id"], 
+                prompt=scene.get("broll_prompt"), 
+                current_timeline_sec=current_time, 
+                generative_3d_prompt=scene.get("generative_3d_prompt")
+            )
             current_time += 15.0 
             
     if progress_callback: progress_callback("Download Musica & Effetti Sonori...", 80)
@@ -72,7 +86,7 @@ async def process_mode_b_c(mode_type: str, file_path: str, format_ratio: str = "
     audio_engine = AudioEngine(whisper_model_size="tiny", device="cuda")
     director = SemanticDirector(api_key=GROQ_API_KEY)
     avatar = AvatarEngine()
-    broll = BRollManager(pexels_api_key=PEXELS_API_KEY)
+    broll = BRollManager(pexels_api_key=PEXELS_API_KEY, google_api_key=GOOGLE_API_KEY)
     sound = AudioDesign()
     assembly = AssemblyEngine(mode=mode_type, format_ratio=format_ratio, raw_media_path=file_path)
 
@@ -103,7 +117,12 @@ async def process_mode_b_c(mode_type: str, file_path: str, format_ratio: str = "
     for scene in director_cut.get("scenes", []):
         is_broll = scene.get("scene_type") == "b-roll" or mode_type == "C"
         if is_broll:
-            broll.process_scene_broll(scene["id"], scene.get("broll_prompt", "cinematic abstract"), current_time)
+            broll.process_scene_broll(
+                scene_id=scene["id"], 
+                prompt=scene.get("broll_prompt", "cinematic abstract"), 
+                current_timeline_sec=current_time,
+                generative_3d_prompt=scene.get("generative_3d_prompt")
+            )
             current_time += 15.0
             
     if progress_callback: progress_callback("Download Musica & Effetti Sonori...", 80)
