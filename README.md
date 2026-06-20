@@ -3,7 +3,7 @@ title: Ale's Editor
 emoji: 🎬
 colorFrom: indigo
 colorTo: blue
-sdk: streamlit
+sdk: docker
 sdk_version: 1.40.0
 app_file: frontend_app.py
 pinned: false
