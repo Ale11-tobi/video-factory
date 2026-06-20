@@ -6,3 +6,7 @@ TTS
 torch
 torchvision
 torchaudio
+xformers
+bitsandbytes
+accelerate
+huggingface_hub

@@ -26,11 +26,14 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "gsk_FMRXKpfcgI3HBQx79WatWGdyb3FY6
 PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "1BBVi0DC0Zt5QhQG37RirCikK7zL2OYMJhXCHmV7ncORynDfvClYMZVj")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", get_google_api_key())
 
-async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callback=None, telegram_token: str = "", telegram_chat_id: str = "") -> str:
+async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callback=None, frontend_options: dict = None, telegram_token: str = "", telegram_chat_id: str = "") -> str:
     """Mode A: Zero-Touch Content Factory"""
     logger.info("=== MODE A: Avvio Pipeline ===")
     
-    director = SemanticDirector(api_key=GROQ_API_KEY)
+    frontend_options = frontend_options or {}
+    smart_3d = frontend_options.get("Smart_3D", "False") == "True"
+    
+    director = SemanticDirector(api_key=GROQ_API_KEY, smart_3d=smart_3d)
     audio_engine = AudioEngine(whisper_model_size="tiny", device="cuda")
     avatar = AvatarEngine()
     broll = BRollManager(pexels_api_key=PEXELS_API_KEY, google_api_key=GOOGLE_API_KEY)

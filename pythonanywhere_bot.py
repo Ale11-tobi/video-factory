@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 # CODICI PERSONALI
 TELEGRAM_TOKEN = "8823767699:AAH6jYjpDYud5sYlnw0Bh-4W9rdF5YSQ7nI"
-GITHUB_TOKEN = "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"
+GITHUB_TOKEN = "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"
 GITHUB_REPO = "Ale11-tobi/video-factory"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -42,7 +42,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         resp = requests.post(url, headers=headers, json=data)
         if resp.status_code == 204:
-            await update.message.reply_text("✅ GitHub ha ricevuto il segnale con successo! Kaggle sta partendo. Attendi il tuo video finito in questa chat tra circa 15-20 minuti.")
+            kaggle_link = "https://www.kaggle.com/code/alessandroiovine/video-factory-run/log"
+            await update.message.reply_text(
+                "✅ GitHub ha ricevuto il segnale! Il server Kaggle è ufficialmente partito.\n\n"
+                f"👀 **Puoi spiare il server e vedere la percentuale di caricamento in diretta qui:**\n{kaggle_link}\n\n"
+                "Attendi il video finito in questa chat tra circa 15-20 minuti!"
+            )
         else:
             await update.message.reply_text(f"❌ Errore da GitHub ({resp.status_code}): {resp.text}")
     except Exception as e:

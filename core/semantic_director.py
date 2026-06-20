@@ -18,15 +18,20 @@ class SemanticDirector:
     Si occupa di analizzare il testo in input e generare il director_cut.json 
     con gestione rigorosa del Rate Limiting (es. 30 req/min).
     """
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, smart_3d: bool = False):
         if not api_key:
             raise ValueError("API Key non fornita.")
         self.client = AsyncGroq(api_key=api_key)
         self.model_name = "llama-3.1-8b-instant"
+        self.smart_3d = smart_3d
 
     def get_system_prompt(self) -> str:
         """Restituisce il prompt di sistema ingegnerizzato per l'LLM."""
-        return """Sei il 'Semantic Director', un regista IA esperto di video short-form virali (TikTok, Reels, Shorts).
+        smart_3d_rule = ""
+        if self.smart_3d:
+            smart_3d_rule = "   -> REGOLA SMART 3D ATTIVA: Analizza lo script per soggetti complessi. Genera 'generative_3d_prompt' dettagliati per essi. Se il soggetto si ripete nel testo, RIUTILIZZA LA STESSA IDENTICA STRINGA DI PROMPT precedente in modo che il motore di rendering recuperi il video dalla cache. Tuttavia, assicurati che le scene 3D uguali NON siano mai adiacenti!"
+
+        return f"""Sei il 'Semantic Director', un regista IA esperto di video short-form virali (TikTok, Reels, Shorts).
 Il tuo obiettivo è smontare uno script testuale e convertirlo in una timeline JSON (director_cut.json) pronta per un'automazione video.
 
 REGOLE TASSATIVE:
@@ -35,7 +40,8 @@ REGOLE TASSATIVE:
    - "avatar": Il presentatore IA parla in camera.
    - "b-roll": Voce fuori campo con clip di stock a copertura dell'intero schermo.
 3. Ottimizzazione Query B-Roll: "broll_prompt" deve essere MASSIMO 1-2 parole in inglese (es. "money", "future", "nature"). DEVI VARIARE SEMPRE LA PAROLA per ogni scena b-roll, NON RIPETERE MAI LA STESSA PAROLA.
-4. Generazione 3D Stile Geopop: "generative_3d_prompt" deve contenere una descrizione in inglese ESTREMAMENTE dettagliata per un generatore video AI 3D (es. "A photorealistic 3D render of a massive golden asteroid floating in deep space, hyperdetailed, Unreal Engine 5, cinematic lighting, Geopop educational style"). Se la scena non necessita di 3D, restituisci null.
+4. Generazione 3D Stile Geopop: "generative_3d_prompt" deve contenere una descrizione in inglese ESTREMAMENTE dettagliata per un generatore video AI 3D (es. "A photorealistic 3D render of a massive golden asteroid floating in deep space..."). Se la scena non necessita di 3D, restituisci null.
+{smart_3d_rule}
 5. PULIZIA TESTO VOCALE (CRITICA): Il campo "text_segment" è la sceneggiatura PURA.
    - NON SCRIVERE MAI NESSUNA INDICAZIONE DI REGIA NEL TEXT_SEGMENT.
    - Estrai SOLO la narrazione. Esempio: se lo script dice "VISUALE: Asteroide. Sapevi che...", in "text_segment" scrivi solo "Sapevi che...".
