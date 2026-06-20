@@ -90,6 +90,22 @@ st.markdown("""
         box-shadow: 0 15px 30px rgba(0, 210, 211, 0.6);
     }
     
+    /* Ottimizzazione iPhone / Mobile */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.2rem !important;
+            line-height: 1.2;
+            margin-top: 1rem;
+        }
+        .stButton>button {
+            font-size: 1rem !important;
+            padding: 0.8rem 1rem;
+        }
+        .stApp {
+            padding: 0px !important;
+        }
+    }
+    
     /* File Uploader */
     [data-testid="stFileUploadDropzone"] {
         background: rgba(255,255,255,0.02);
@@ -160,8 +176,8 @@ with tab_regia:
 
 # --- TAB 2: AVATAR ---
 with tab_avatar:
-    st.subheader("Personalizzazione del Volto")
-    st.info("Attualmente il motore open-source anima perfettamente il labiale e le espressioni facciali. Le animazioni complesse del corpo arriveranno nei prossimi update gratuiti.")
+    st.subheader("Personalizzazione del Volto e Animazione 3D")
+    st.success("✅ **MOTORE TITAN ATTIVO:** Il sistema ora integra NVIDIA Kimodo, Tencent HY-Motion e AniGen. Puoi caricare il tuo avatar e descrivere movimenti complessi del corpo (es. 'accarezza il gatto'). L'IA genererà lo scheletro 3D e lo renderizzerà su Kaggle.")
     
     col3, col4 = st.columns(2)
     with col3:
@@ -176,7 +192,7 @@ with tab_avatar:
 # --- TAB 3: GENERATORE 3D ---
 with tab_3d:
     st.subheader("Motore di Animazione 3D (Stile Geopop)")
-    st.warning("⚠️ L'intelligenza Artificiale Open-Source attuale farà del suo meglio per avvicinarsi alla qualità Maya/Blender. Il motore cercherà le migliori clip stock 3D o ne genererà di simili.")
+    st.success("🚀 **PROGETTO TITAN ATTIVO:** La generazione non usa più clip stock. Il tuo testo viene processato dai tensori PyTorch su Kaggle per generare modelli 3D reali e renderizzati in Blender Headless con luci cinematografiche.")
     
     enable_3d = st.toggle("🌟 Genera Animazioni 3D Scientifiche/Educative", value=False)
     
