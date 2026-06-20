@@ -8,7 +8,7 @@ import random
 import string
 
 # --- 1. CONFIGURAZIONE PAGINA ---
-st.set_page_config(page_title="Antigravity Studio", page_icon="🛸", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Ale's Editor", page_icon="🎬", layout="wide", initial_sidebar_state="expanded")
 
 # --- 2. CSS SPAZIALE (Glassmorphism & Neon) ---
 st.markdown("""
@@ -24,8 +24,8 @@ st.markdown("""
         color: #dfe6e9;
     }
     
-    /* Titoli Neon */
-    h1 {
+    /* Titolo Principale (Solo per classe main-title) */
+    .main-title {
         background: linear-gradient(to right, #00d2d3, #6c5ce7, #ff7675);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -35,6 +35,13 @@ st.markdown("""
         margin-bottom: 0.5rem;
         text-transform: uppercase;
         letter-spacing: 2px;
+    }
+    
+    /* Ridimensionamento Titoli Sidebar */
+    [data-testid="stSidebar"] h1 {
+        font-size: 1.5rem !important;
+        background: none;
+        -webkit-text-fill-color: #dfe6e9;
     }
     
     /* Box stile Vetro (Glassmorphism) */
@@ -95,7 +102,7 @@ st.markdown("""
     
     /* Ottimizzazione iPhone / Mobile */
     @media (max-width: 768px) {
-        h1 {
+        .main-title {
             font-size: 2.2rem !important;
             line-height: 1.2;
             margin-top: 1rem;
@@ -153,7 +160,7 @@ def append_history(record):
 config = load_config()
 
 # --- 4. HEADER ---
-st.markdown("<h1>🛸 Antigravity Studio</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title'>🎬 Ale's Editor</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #a4b0be; font-size: 1.2rem;'>Il primo motore Generativo Cloud-Native 100% Gratuito</p>", unsafe_allow_html=True)
 st.write("")
 
@@ -197,10 +204,15 @@ with tab_avatar:
     
     col3, col4 = st.columns(2)
     with col3:
-        avatar_img = st.file_uploader("Trascina qui l'immagine del tuo Avatar (PNG/JPG)", type=['png', 'jpg', 'jpeg'])
+        avatar_img = st.file_uploader("Trascina qui l'immagine del tuo Avatar Personale (PNG/JPG)", type=['png', 'jpg', 'jpeg'])
         if avatar_img:
-            st.success("Immagine caricata in memoria!")
+            st.success("Immagine personalizzata caricata in memoria!")
             st.image(avatar_img, width=150)
+        else:
+            default_avatar_path = "assets/avatar.png"
+            if os.path.exists(default_avatar_path):
+                st.info("Avatar Base Selezionato (Verrà usato in automatico)")
+                st.image(default_avatar_path, width=150)
             
     with col4:
         avatar_prompt = st.text_area("Istruzioni Avanzate per l'Animazione", placeholder="Es. Muovi la bocca a tempo, espressione sorpresa al secondo 10, muovi la mano (sperimentale)...", height=150)
