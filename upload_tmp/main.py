@@ -49,62 +49,18 @@ async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callba
     if progress_callback: progress_callback("Rendering Avatar Statico...", 40)
     avatar.render_avatar(vlog_mode=False)
     
-    if progress_callback: progress_callback("Ricerca B-Roll e Generazione Avatar Dinamico...", 60)
-    # Carica i timestamp reali per calcolare la durata totale esatta
-    word_timestamps = []
-    try:
-        with open("temp/word_timestamps.json", "r", encoding="utf-8") as f:
-            word_timestamps = json.load(f)
-    except Exception:
-        pass
-        
-    total_audio_duration = word_timestamps[-1]["end"] if word_timestamps else 300.0
-    
-    # Calcola il numero totale di caratteri per una distribuzione proporzionale esatta
-    all_scenes = director_cut.get("scenes", [])
-    total_chars = sum(len(scene.get("text_segment", "").strip()) for scene in all_scenes)
-    total_chars = max(1, total_chars)
-    
+    if progress_callback: progress_callback("Ricerca B-Roll su Pexels...", 60)
     current_time = 0.0
-    scene_index = 0
-    
-    for scene in all_scenes:
-        text = scene.get("text_segment", "").strip()
-        scene_chars = len(text)
-        
-        scene_duration = (scene_chars / total_chars) * total_audio_duration
-        scene_duration = max(0.1, scene_duration)
-        
-        end_t = current_time + scene_duration
-        
-        if end_t > total_audio_duration:
-            end_t = total_audio_duration
-        
-        is_broll = scene.get("scene_type") == "b-roll"
-        force_avatar = (scene_index > 0 and scene_index % 4 == 0) # Alternanza: Avatar ogni ~60 sec
-        
-        broll_filename = None
-        if is_broll and not force_avatar:
-            broll_filename = broll.process_scene_broll(
+    for scene in director_cut.get("scenes", []):
+        if scene.get("scene_type") == "b-roll":
+            broll.process_scene_broll(
                 scene_id=scene["id"], 
                 prompt=scene.get("broll_prompt"), 
                 current_timeline_sec=current_time, 
                 generative_3d_prompt=scene.get("generative_3d_prompt")
             )
+            current_time += 15.0 
             
-        if not broll_filename:
-            logger.info(f"Fallback Avatar attivato per scena {scene['id']} (Alternanza o B-roll assente)")
-            # Evitiamo start_sec troppo oltre il limite
-            safe_start = min(current_time, max(0.0, total_audio_duration - 1.0))
-            avatar_clip = avatar.generate_segment(start_sec=safe_start, duration=scene_duration, segment_id=scene["id"])
-            scene["fallback_avatar"] = avatar_clip
-            
-        current_time = end_t 
-        scene_index += 1
-        
-    # Salva il JSON aggiornato con i riferimenti alle clip Avatar dinamiche
-    with open("temp/director_cut.json", "w", encoding="utf-8") as f:
-        json.dump(director_cut, f, indent=4, ensure_ascii=False)            
     if progress_callback: progress_callback("Download Musica & Effetti Sonori...", 80)
     sound.fetch_background_music("https://www.youtube.com/playlist?list=PLRBp0Fe2GpgnIh0AiYKh7o7HnYAej-5ph")
     sound.analyze_beats(audio_path="temp/bg_music.wav", output_json="temp/music_beats.json")

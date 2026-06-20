@@ -24,3 +24,8 @@ SadTalker/
 .streamlit/
 .DS_Store
 Thumbs.db
+
+# Segreti e Archivi
+config.json
+*.zip
+kaggle_deploy/

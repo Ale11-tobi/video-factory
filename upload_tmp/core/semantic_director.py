@@ -76,80 +76,44 @@ FORMATO DI RISPOSTA (ESCLUSIVAMENTE JSON VALIDO):
                 {"role": "system", "content": self.get_system_prompt()},
                 {"role": "user", "content": f"SCRIPT INPUT:\n{script_text}"}
             ],
-            temperature=0.3,
-            max_tokens=2000
+            response_format={"type": "json_object"},
+            temperature=0.3
         )
-        content = response.choices[0].message.content
-        
-        # Pulizia robusta del JSON usando regex nel caso l'LLM aggiunga testo o markdown
-        import re
-        match = re.search(r'\{[\s\S]*\}', content)
-        if match:
-            content = match.group(0)
-            
-        # Rimuove le virgole finali ("trailing commas") che Llama 3 spesso genera per errore
-        content = re.sub(r',\s*\}', '}', content)
-        content = re.sub(r',\s*\]', ']', content)
-            
-        return content
+        return response.choices[0].message.content
 
     async def generate_director_cut(self, script_text: str, output_path: str = "temp/director_cut.json") -> Dict[str, Any]:
         """
-        Esegue l'analisi semantica suddividendo il testo in chunk per rispettare i limiti TPM di Groq.
+        Esegue l'analisi semantica e produce l'artefatto JSON per i moduli successivi.
         """
         logger.info("Avvio analisi semantica dello script...")
         
-        # Suddivisione in chunk da circa 1500 caratteri per evitare il limite di 6000 TPM
-        chunk_size = 1500
-        chunks = []
-        words = script_text.split()
-        current_chunk = []
-        current_len = 0
-        
-        for word in words:
-            current_chunk.append(word)
-            current_len += len(word) + 1
-            if current_len >= chunk_size:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = []
-                current_len = 0
-        if current_chunk:
-            chunks.append(" ".join(current_chunk))
-            
-        all_scenes = []
-        video_title = "Video Generato"
-        
         try:
-            for i, chunk in enumerate(chunks):
-                logger.info(f"Elaborazione chunk {i+1}/{len(chunks)}...")
-                response_json = await self._call_llm_api(chunk)
-                
-                try:
-                    data = json.loads(response_json)
-                    if "video_title" in data and i == 0:
-                        video_title = data["video_title"]
-                    if "scenes" in data:
-                        all_scenes.extend(data["scenes"])
-                except json.JSONDecodeError as e:
-                    logger.error(f"Errore parsing JSON dal chunk {i+1}: {e}")
-                    
-                if i < len(chunks) - 1:
-                    await asyncio.sleep(5)
-                    
-            for idx, scene in enumerate(all_scenes):
-                scene["id"] = idx + 1
-                
-            director_cut = {
-                "video_title": video_title,
-                "scenes": all_scenes
-            }
+            json_response = await self._call_llm_api(script_text)
+            director_cut = json.loads(json_response)
             
+            # Sanitizzazione di emergenza lato Python
+            for scene in director_cut.get("scenes", []):
+                if "text_segment" in scene:
+                    txt = scene["text_segment"]
+                    # Rimuove parole TUTTO MAIUSCOLO seguite da due punti (es VISUALE:)
+                    txt = re.sub(r'\b[A-ZÀ-Ú_ -]+:\s*', '', txt)
+                    # Rimuove parentesi
+                    txt = re.sub(r'\[.*?\]', '', txt)
+                    txt = re.sub(r'\(.*?\)', '', txt)
+                    scene["text_segment"] = txt.strip()
+            
+            # Crea le cartelle se non esistono (gestione path automatica per MVP)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            
             with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(director_cut, f, indent=4, ensure_ascii=False)
+                json.dump(director_cut, f, indent=4)
                 
-            logger.info(f"Director cut salvato in {output_path} con {len(all_scenes)} scene totali.")
+            logger.info(f"Director cut generato con successo e salvato in {output_path}")
             return director_cut
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Errore critico: l'LLM non ha restituito un JSON valido. Dettagli: {e}")
+            raise
         except Exception as e:
             logger.error(f"Errore imprevisto nel Semantic Director: {e}")
             raise

@@ -175,24 +175,13 @@ if "Mode A" in mode:
                 sl_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s', '%H:%M:%S'))
                 logger.addHandler(sl_handler)
                 
-                import time
-                start_time = time.time()
                 def local_progress(msg, pct=0):
-                    time_str = ""
-                    if pct > 0:
-                        elapsed = time.time() - start_time
-                        est_total = (elapsed / pct) * 100
-                        est_remaining = max(0, est_total - elapsed)
-                        mins, secs = divmod(int(est_remaining), 60)
-                        time_str = f" ⏳ (Stimato: ~{mins}m {secs}s rimanenti)"
-                        
-                    full_msg = f"{msg}{time_str}"
-                    status.update(label=f"{pct}% - {full_msg}")
-                    progress_bar.progress(pct, text=full_msg)
+                    status.update(label=f"{pct}% - {msg}")
+                    progress_bar.progress(pct, text=msg)
                     try:
                         os.makedirs("temp", exist_ok=True)
                         with open("temp/status.json", "w", encoding="utf-8") as f:
-                            json.dump({"pct": pct, "msg": full_msg, "mode": "A"}, f)
+                            json.dump({"pct": pct, "msg": msg, "mode": "A"}, f)
                     except: pass
                 
                 try:
@@ -233,24 +222,13 @@ else:
             sl_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s', '%H:%M:%S'))
             logger.addHandler(sl_handler)
             
-            import time
-            start_time = time.time()
             def local_progress(msg, pct=0):
-                time_str = ""
-                if pct > 0:
-                    elapsed = time.time() - start_time
-                    est_total = (elapsed / pct) * 100
-                    est_remaining = max(0, est_total - elapsed)
-                    mins, secs = divmod(int(est_remaining), 60)
-                    time_str = f" ⏳ (Stimato: ~{mins}m {secs}s rimanenti)"
-                    
-                full_msg = f"{msg}{time_str}"
-                status.update(label=f"{pct}% - {full_msg}")
-                progress_bar.progress(pct, text=full_msg)
+                status.update(label=f"{pct}% - {msg}")
+                progress_bar.progress(pct, text=msg)
                 try:
                     os.makedirs("temp", exist_ok=True)
                     with open("temp/status.json", "w", encoding="utf-8") as f:
-                        json.dump({"pct": pct, "msg": full_msg, "mode": mode_letter}, f)
+                        json.dump({"pct": pct, "msg": msg, "mode": mode_letter}, f)
                 except: pass
                 
             try:

@@ -127,33 +127,26 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         last_overlay = "[base]"
         for i, scene in enumerate(scenes):
             is_broll = scene.get("scene_type") == "b-roll" or self.mode == "C"
-            fallback_avatar = scene.get("fallback_avatar")
             
-            clip_path = None
-            if fallback_avatar and os.path.exists(fallback_avatar):
-                clip_path = fallback_avatar
-            elif is_broll:
+            if is_broll:
                 broll_path = os.path.join(self.temp_path, f"scene_{scene['id']}_broll.mp4")
                 if os.path.exists(broll_path):
-                    clip_path = broll_path
+                    inputs.extend(["-i", broll_path])
+                    start_t = cut_times[i]
+                    end_t = cut_times[i+1]
+                    duration = end_t - start_t
                     
-            if clip_path:
-                inputs.extend(["-i", clip_path])
-                start_t = cut_times[i]
-                end_t = cut_times[i+1]
-                duration = end_t - start_t
-                
-                filter_complex.append(
-                    f"[{broll_idx}:v]scale={self.w}:{self.h}:force_original_aspect_ratio=increase,"
-                    f"crop={self.w}:{self.h},setsar=1,trim=0:{duration},setpts=PTS-STARTPTS[b{broll_idx}];"
-                )
-                
-                next_overlay = f"[ov{broll_idx}]"
-                filter_complex.append(
-                    f"{last_overlay}[b{broll_idx}]overlay=x=0:y=0:enable='between(t,{start_t},{end_t})'{next_overlay};"
-                )
-                last_overlay = next_overlay
-                broll_idx += 1
+                    filter_complex.append(
+                        f"[{broll_idx}:v]scale={self.w}:{self.h}:force_original_aspect_ratio=increase,"
+                        f"crop={self.w}:{self.h},setsar=1,trim=0:{duration},setpts=PTS-STARTPTS[b{broll_idx}];"
+                    )
+                    
+                    next_overlay = f"[ov{broll_idx}]"
+                    filter_complex.append(
+                        f"{last_overlay}[b{broll_idx}]overlay=x=0:y=0:enable='between(t,{start_t},{end_t})'{next_overlay};"
+                    )
+                    last_overlay = next_overlay
+                    broll_idx += 1
 
         # Uso un path relativo per evitare problemi di spazi o escape strani di Windows
         rel_ass_path = "temp/subtitles.ass"
@@ -175,11 +168,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         final_filter = "".join(filter_complex)
         output_file = os.path.join(self.output_path, f"final_video_{self.mode}.mp4")
         
-        # Scrive il filtro in un file per aggirare WinError 206 (limite cmd Windows)
-        filter_script_path = os.path.join(self.temp_path, "ffmpeg_filter.txt")
-        with open(filter_script_path, "w", encoding="utf-8") as f:
-            f.write(final_filter)
-        
         BASE_DIR = os.path.dirname(os.path.dirname(__file__))
         ffmpeg_exe = os.path.join(BASE_DIR, "venv", "Scripts", "ffmpeg.exe")
         if not os.path.exists(ffmpeg_exe): ffmpeg_exe = "ffmpeg" # Fallback globale
@@ -187,7 +175,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         cmd = [
             ffmpeg_exe, "-y",
             *inputs,
-            "-filter_complex_script", filter_script_path,
+            "-filter_complex", final_filter,
             "-map", "[vfinal]",
             "-map", "[afinal]",
             "-c:v", "h264_nvenc", "-preset", "p4", "-cq", "20", "-b:v", "0",
