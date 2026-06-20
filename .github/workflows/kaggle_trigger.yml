@@ -1,0 +1,72 @@
+name: Trigger Kaggle Run
+
+on:
+  repository_dispatch:
+    types: [trigger_kaggle]
+
+jobs:
+  run-kaggle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Kaggle API
+        run: pip install kaggle
+
+      - name: Prepare Kaggle Deploy Folder
+        run: |
+          mkdir -p kaggle_deploy
+          
+          # Creiamo il file input.txt con il testo inviato da Telegram
+          cat << 'EOF' > kaggle_deploy/input_text.txt
+          ${{ github.event.client_payload.text }}
+          EOF
+          
+          # Creiamo config.json con il Chat ID che ha inviato il messaggio
+          cat << 'EOF' > kaggle_deploy/config.json
+          {
+            "telegram_bot_token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
+            "telegram_chat_id": "${{ github.event.client_payload.chat_id }}"
+          }
+          EOF
+          
+          # Creiamo lo script python che Kaggle eseguira sulla GPU
+          cat << 'EOF' > kaggle_deploy/run_video.py
+          import os
+          os.system("git clone https://github.com/Ale11-tobi/video-factory.git")
+          os.chdir("video-factory")
+          os.system("cp ../input_text.txt .")
+          os.system("cp ../config.json .")
+          os.system("sed -i '/TTS/d' requirements.txt")
+          os.system("pip install -r requirements.txt")
+          os.system("python cli_runner.py input_text.txt")
+          EOF
+          
+          # Creiamo metadata per Kaggle
+          cat << 'EOF' > kaggle_deploy/kernel-metadata.json
+          {
+            "id": "${{ secrets.KAGGLE_USERNAME }}/video-factory-run",
+            "title": "Video Factory Run",
+            "code_file": "run_video.py",
+            "language": "python",
+            "kernel_type": "script",
+            "is_private": "true",
+            "enable_gpu": "true",
+            "enable_internet": "true",
+            "dataset_sources": [],
+            "competition_sources": [],
+            "kernel_sources": []
+          }
+          EOF
+
+      - name: Push to Kaggle
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+        run: kaggle kernels push -p kaggle_deploy
