@@ -1,16 +1,19 @@
-FROM python:3.10-slim
+FROM python:3.10
 
-WORKDIR /app
+# Hugging Face richiede che il server giri come utente 1000 per poter salvare i file (config.json, history.json)
+RUN useradd -m -u 1000 user
+USER user
+ENV PATH="/home/user/.local/bin:$PATH"
 
-# Copia solo il file delle librerie del sito (niente roba pesante di Kaggle)
-COPY requirements_frontend.txt .
+WORKDIR /home/user/app
+
+# Copia solo il file delle librerie del sito
+COPY --chown=user requirements_frontend.txt .
 RUN pip install --no-cache-dir -r requirements_frontend.txt
 
-# Copia il resto dei file
-COPY . .
+# Copia tutto il codice dando i permessi all'utente
+COPY --chown=user . .
 
-# Espone la porta usata da Hugging Face
 EXPOSE 7860
 
-# Lancia il sito
 CMD ["streamlit", "run", "frontend_app.py", "--server.port", "7860", "--server.address", "0.0.0.0"]
