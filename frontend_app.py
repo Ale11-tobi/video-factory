@@ -3,6 +3,7 @@ import requests
 import json
 import os
 import base64
+import datetime
 
 # --- 1. CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Antigravity Studio", page_icon="🛸", layout="wide", initial_sidebar_state="expanded")
@@ -123,6 +124,7 @@ st.markdown("""
 GITHUB_TOKEN = "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"
 GITHUB_REPO = "Ale11-tobi/video-factory"
 CONFIG_FILE = "config.json"
+HISTORY_FILE = "history.json"
 
 def load_config():
     if os.path.exists(CONFIG_FILE):
@@ -133,6 +135,18 @@ def load_config():
 
 def save_config(chat_id):
     with open(CONFIG_FILE, "w") as f: json.dump({"tg_chat_id": chat_id}, f)
+
+def load_history():
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f: return json.load(f)
+        except: pass
+    return []
+
+def append_history(record):
+    hist = load_history()
+    hist.insert(0, record)
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f: json.dump(hist[:20], f, ensure_ascii=False, indent=2)
 
 config = load_config()
 
@@ -188,6 +202,7 @@ with tab_avatar:
             
     with col4:
         avatar_prompt = st.text_area("Istruzioni Avanzate per l'Animazione", placeholder="Es. Muovi la bocca a tempo, espressione sorpresa al secondo 10, muovi la mano (sperimentale)...", height=150)
+        avatar_export = st.radio("Modalità di Esportazione (Avatar)", ["Integra nel Video Finale", "Esporta come Video Separato"])
 
 # --- TAB 3: GENERATORE 3D ---
 with tab_3d:
@@ -199,7 +214,8 @@ with tab_3d:
     if enable_3d:
         smart_3d = st.toggle("🧠 Generazione 3D Intelligente (Memoria e Riutilizzo Asset)", value=True, help="L'IA capirà dove inserire il 3D e riutilizzerà i render se il soggetto si ripete, risparmiando memoria.")
         prompt_3d = st.text_area("Descrivi nel dettaglio l'animazione 3D desiderata:", placeholder="Es. Un modello 3D della terra che si spacca a metà mostrando il nucleo incandescente, risoluzione altissima, stile geopop...")
-        pos_3d = st.selectbox("Posizionamento nel video", ["A metà video", "All'inizio", "Alla fine come conclusione"])
+        pos_3d = st.selectbox("Posizionamento nel video", ["Intelligente (Decide il Regista IA)", "A metà video", "All'inizio", "Alla fine come conclusione"])
+        export_3d = st.radio("Modalità di Esportazione (3D)", ["Integra nel Video Finale", "Esporta come Video Separato"], key="3d_exp")
     else:
         smart_3d = False
 
@@ -210,6 +226,7 @@ with tab_asset:
     custom_video = st.file_uploader("Carica Video/Clip Personali (MP4)", type=['mp4', 'mov'])
     if custom_video:
         custom_instructions = st.text_input("Istruzioni:", placeholder="Es. Inserisci questa clip quando dico la parola 'Vulcano'")
+        asset_export = st.radio("Modalità di Utilizzo (Asset)", ["Integra nel Video Finale", "Usa per Video Separato"], key="asset_exp")
 
 st.markdown("---")
 
@@ -220,6 +237,22 @@ st.sidebar.markdown("Il sito è la vetrina. Kaggle è il motore.")
 tg_chat_id = st.sidebar.text_input("🔑 Il tuo Chat ID Telegram", value=config.get("tg_chat_id", ""), help="Serve per mandarti le notifiche live e il video finito.")
 if tg_chat_id != config.get("tg_chat_id"):
     save_config(tg_chat_id)
+
+st.sidebar.markdown("---")
+st.sidebar.title("📚 Cronologia Progetti")
+hist_data = load_history()
+if not hist_data:
+    st.sidebar.info("Nessun progetto salvato.")
+else:
+    for idx, item in enumerate(hist_data):
+        with st.sidebar.expander(f"🕒 {item['date']} - {item['preview']}"):
+            st.write(f"**Stile:** {item['style']}")
+            st.markdown("[✈️ Apri Video su Telegram](https://web.telegram.org/)", unsafe_allow_html=True)
+            if st.button("🔄 Ricarica Impostazioni", key=f"btn_hist_{idx}"):
+                st.session_state.user_text = item['text']
+                st.rerun()
+
+st.sidebar.markdown("---")
 
 if st.button("🔥 ACCENDI I MOTORI CLOUD E GENERA 🔥"):
     if not st.session_state.user_text:
@@ -239,9 +272,13 @@ Format: {format_ratio}
 Style: {style}
 MegaSubs: {subs_mega}
 Avatar_Prompt: {avatar_prompt if 'avatar_prompt' in locals() else 'None'}
+Avatar_Export: {avatar_export if 'avatar_export' in locals() else 'Integra nel Video Finale'}
 Use_3D: {enable_3d if 'enable_3d' in locals() else False}
 Smart_3D: {smart_3d if 'smart_3d' in locals() else False}
 Prompt_3D: {prompt_3d if 'enable_3d' in locals() and enable_3d else 'None'}
+Pos_3D: {pos_3d if 'enable_3d' in locals() and enable_3d else 'Intelligente'}
+Export_3D: {export_3d if 'export_3d' in locals() else 'Integra nel Video Finale'}
+Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Video Finale'}
 [/ADVANCED_CONFIG]
 
 {st.session_state.user_text}
@@ -267,6 +304,17 @@ Prompt_3D: {prompt_3d if 'enable_3d' in locals() and enable_3d else 'None'}
                     st.info("📱 Controlla Telegram! Stai per ricevere gli aggiornamenti in tempo reale.")
                     st.markdown("[👀 Guarda la Console di Kaggle in Diretta](https://www.kaggle.com/code/alessandroiovine/video-factory-run/log)")
                     st.balloons()
+                    
+                    # Salva nella history
+                    record = {
+                        "date": datetime.datetime.now().strftime("%d %b %H:%M"),
+                        "preview": st.session_state.user_text[:20] + "...",
+                        "text": st.session_state.user_text,
+                        "mode": mode,
+                        "style": style
+                    }
+                    append_history(record)
+                    
                 else:
                     st.error(f"❌ Errore Backend ({resp.status_code}): {resp.text}")
             except Exception as e:
