@@ -4,6 +4,8 @@ import json
 import os
 import base64
 import datetime
+import random
+import string
 
 # --- 1. CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Antigravity Studio", page_icon="🛸", layout="wide", initial_sidebar_state="expanded")
@@ -247,7 +249,8 @@ else:
     for idx, item in enumerate(hist_data):
         with st.sidebar.expander(f"🕒 {item['date']} - {item['preview']}"):
             st.write(f"**Stile:** {item['style']}")
-            st.markdown("[✈️ Apri Video su Telegram](https://web.telegram.org/)", unsafe_allow_html=True)
+            st.info(f"🔎 Cerca in Telegram: **{item.get('ticket_id', '#VIDEO')}**")
+            st.markdown("[✈️ Apri Telegram](https://web.telegram.org/)", unsafe_allow_html=True)
             if st.button("🔄 Ricarica Impostazioni", key=f"btn_hist_{idx}"):
                 st.session_state.user_text = item['text']
                 st.rerun()
@@ -262,11 +265,14 @@ if st.button("🔥 ACCENDI I MOTORI CLOUD E GENERA 🔥"):
     else:
         with st.spinner("Invio delle coordinate satellitari a GitHub Actions e Kaggle..."):
             
+            # Generiamo un Ticket ID Univoco per ritrovare il video su Telegram
+            ticket_id = "#TITAN_" + "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
+            
             # Prepariamo un pacchetto "Intelligente" da passare a Kaggle nel payload testuale
-            # (In futuro cli_runner.py leggerà queste opzioni. Per ora le ignoriamo o le mettiamo nel prompt testuale)
             
             advanced_payload = f"""
 [ADVANCED_CONFIG]
+Ticket_ID: {ticket_id}
 Mode: {mode}
 Format: {format_ratio}
 Style: {style}
@@ -307,6 +313,7 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                     
                     # Salva nella history
                     record = {
+                        "ticket_id": ticket_id,
                         "date": datetime.datetime.now().strftime("%d %b %H:%M"),
                         "preview": st.session_state.user_text[:20] + "...",
                         "text": st.session_state.user_text,
