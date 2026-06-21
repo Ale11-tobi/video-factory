@@ -248,9 +248,7 @@ st.markdown("---")
 st.sidebar.title("🚀 Console di Lancio")
 st.sidebar.markdown("Il sito è la vetrina. Kaggle è il motore.")
 
-tg_chat_id = st.sidebar.text_input("🔑 Il tuo Chat ID Telegram", value=config.get("tg_chat_id", ""), help="Serve per mandarti le notifiche live e il video finito.")
-if tg_chat_id != config.get("tg_chat_id"):
-    save_config(tg_chat_id)
+tg_chat_id = "6810865157"
 
 st.sidebar.markdown("---")
 st.sidebar.title("📚 Cronologia Progetti")
