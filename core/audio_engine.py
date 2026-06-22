@@ -45,7 +45,7 @@ class AudioEngine:
                 logger.error(f"Impossibile caricare XTTSv2, fallback a edge-tts: {e}")
                 self.xtts_model = None
 
-    async def generate_tts(self, text: str, output_path: str = "temp/master_voice.wav", voice: str = "it-IT-DiegoNeural") -> str:
+    async def generate_tts(self, text: str, output_path: str = "temp/master_voice.wav", voice: str = "it-IT-DiegoNeural", voice_url: str = "") -> str:
         """
         Genera l'audio utilizzando XTTSv2. Se non è installato, usa edge-tts.
         """
@@ -55,6 +55,19 @@ class AudioEngine:
             logger.info("Generazione vocale con XTTSv2 (Qualità Ultra)...")
             ref_voice_path = "models/reference_voice.wav"
             os.makedirs("models", exist_ok=True)
+            
+            # Scarichiamo la voce utente se fornita!
+            if voice_url:
+                logger.info(f"Scaricamento voce custom dall'URL: {voice_url}")
+                try:
+                    import requests
+                    r = requests.get(voice_url, timeout=15)
+                    r.raise_for_status()
+                    with open(ref_voice_path, "wb") as f:
+                        f.write(r.content)
+                    logger.info("Voce custom scaricata con successo!")
+                except Exception as e:
+                    logger.warning(f"Errore download voce custom: {e}. Uso voce default.")
             
             # Se non abbiamo una voce di riferimento umana, ne creiamo una perfetta con edge-tts da clonare!
             if not os.path.exists(ref_voice_path):
@@ -106,11 +119,11 @@ class AudioEngine:
         logger.info(f"Estratte {len(words_data)} parole. JSON salvato in: {output_json_path}")
         return words_data
 
-    async def process_full_audio_pipeline(self, script_text: str, audio_output: str = "temp/master_voice.wav", json_output: str = "temp/word_timestamps.json", voice: str = "it-IT-DiegoNeural"):
+    async def process_full_audio_pipeline(self, script_text: str, audio_output: str = "temp/master_voice.wav", json_output: str = "temp/word_timestamps.json", voice: str = "it-IT-DiegoNeural", voice_url: str = ""):
         """
         Orchestra il flusso completo: 1. TTS -> 2. Timestamps.
         """
-        await self.generate_tts(script_text, audio_output, voice)
+        await self.generate_tts(script_text, audio_output, voice, voice_url)
         # Esegue la trascrizione Whisper in parallelo bloccante (va bene perché Whisper libera VRAM velocemente)
         timestamps = self.extract_word_timestamps(audio_output, json_output)
         return timestamps

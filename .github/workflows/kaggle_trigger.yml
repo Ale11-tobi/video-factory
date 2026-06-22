@@ -28,6 +28,7 @@ jobs:
           CHAT_ID: ${{ github.event.client_payload.chat_id }}
           GITHUB_TOKEN_PAYLOAD: ${{ github.event.client_payload.github_token }}
           GIST_ID_PAYLOAD: ${{ github.event.client_payload.gist_id }}
+          VOICE_URL_PAYLOAD: ${{ github.event.client_payload.voice_url }}
         run: |
           python3 << 'PYEOF'
           import requests, json, os
@@ -39,6 +40,7 @@ jobs:
           tg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
           gh_token = os.environ.get("GITHUB_TOKEN_PAYLOAD", "")
           gist_id = os.environ.get("GIST_ID_PAYLOAD", "")
+          voice_url = os.environ.get("VOICE_URL_PAYLOAD", "")
 
           # Build the code that Kaggle will run on the GPU
           code = f"""
@@ -48,7 +50,7 @@ jobs:
               f.write('''{script_text}''')
           # Write config
           import json
-          config = {{"telegram_bot_token": "{tg_token}", "telegram_chat_id": "{chat_id}", "github_token": "{gh_token}", "gist_id": "{gist_id}"}}
+          config = {{"telegram_bot_token": "{tg_token}", "telegram_chat_id": "{chat_id}", "github_token": "{gh_token}", "gist_id": "{gist_id}", "voice_url": "{voice_url}"}}
           with open("config.json", "w") as f:
               json.dump(config, f)
           # Clone repo and run

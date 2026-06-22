@@ -44,7 +44,7 @@ PlayResY: {self.h}
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, OutlineColour, BackColour, Bold, Italic, Alignment, BorderStyle, Outline, Shadow, MarginL, MarginR, MarginV
-Style: MrBeast,Impact,90,&H0000FFFF,&H00000000,&H80000000,-1,0,2,1,6,0,10,10,150
+Style: MrBeast,Impact,90,&H00FFFFFF,&H00000000,&H80000000,-1,0,2,1,6,0,10,10,150
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -62,7 +62,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 start_t = format_time(w["start"])
                 end_t = format_time(w["end"])
                 text = w["word"].upper().replace('"', '').replace("'", "")
-                f.write(f"Dialogue: 0,{start_t},{end_t},MrBeast,,0,0,0,,{text}\n")
+                
+                # Colore giallo per parole lunghe, verde per parole chiave, altrimenti bianco
+                color_tag = ""
+                if len(text) > 7:
+                    color_tag = "\\c&H0000FFFF&" # Giallo
+                elif text in ["SPAZIALE", "INCREDIBILE", "ASSURDO", "SEGRETO"]:
+                    color_tag = "\\c&H0000FF00&" # Verde
+                    
+                # Effetto Pop (Alex Hormozi style)
+                pop_effect = "{\\fscx80\\fscy80\\t(0,50,\\fscx110\\fscy110)\\t(50,150,\\fscx100\\fscy100)" + color_tag + "}"
+                
+                f.write(f"Dialogue: 0,{start_t},{end_t},MrBeast,,0,0,0,,{pop_effect}{text}\n")
 
     def _find_closest_beat(self, target_time: float, beats: List[float]) -> float:
         if not beats:
@@ -161,16 +172,38 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
         # --- MIXAGGIO AUDIO ---
         voice_idx = broll_idx if self.mode in ["A", "B"] else broll_idx
-        bgm_idx = voice_idx + 1
         inputs.extend(["-i", master_voice_path])
+        current_audio_streams = [f"[{voice_idx}:a]"]
+        next_idx = voice_idx + 1
         
         has_bgm = os.path.exists(bg_music_path)
         if has_bgm:
             inputs.extend(["-i", bg_music_path])
-            filter_complex.append(f"[{bgm_idx}:a]volume=0.1,atrim=0:{total_duration}[bgm];")
-            filter_complex.append(f"[{voice_idx}:a][bgm]amix=inputs=2:duration=first:dropout_transition=3[afinal]")
+            filter_complex.append(f"[{next_idx}:a]volume=0.1,atrim=0:{total_duration}[bgm];")
+            current_audio_streams.append("[bgm]")
+            next_idx += 1
+            
+        # Aggiungiamo SFX se esistono per le scene
+        import glob
+        for i, scene in enumerate(scenes):
+            scene_id = scene.get("id")
+            sfx_files = glob.glob(os.path.join(self.temp_path, f"scene_{scene_id}_sfx_*.wav"))
+            if sfx_files:
+                sfx_path = sfx_files[0]
+                inputs.extend(["-i", sfx_path])
+                start_t = cut_times[i]
+                # Delay the SFX to match the scene start time
+                filter_complex.append(f"[{next_idx}:a]adelay={int(start_t*1000)}|{int(start_t*1000)},volume=0.8[sfx{i}];")
+                current_audio_streams.append(f"[sfx{i}]")
+                next_idx += 1
+                
+        # Mix finale
+        num_audio_streams = len(current_audio_streams)
+        if num_audio_streams > 1:
+            streams_str = "".join(current_audio_streams)
+            filter_complex.append(f"{streams_str}amix=inputs={num_audio_streams}:duration=first:dropout_transition=3[afinal]")
         else:
-            filter_complex.append(f"[{voice_idx}:a]anull[afinal]")
+            filter_complex.append(f"{current_audio_streams[0]}anull[afinal]")
 
         final_filter = "".join(filter_complex)
         output_file = os.path.join(self.output_path, f"final_video_{self.mode}.mp4")

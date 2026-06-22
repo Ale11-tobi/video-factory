@@ -4,3 +4,7 @@ faster-whisper
 edge-tts
 groq
 tenacity
+TTS
+torch
+torchaudio
+accelerate

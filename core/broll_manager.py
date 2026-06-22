@@ -123,6 +123,47 @@ class BRollManager:
             logger.error(f"Errore di rete con Google Veo: {e}. Fallback su Pexels.")
             return None
 
+    def _fetch_from_pollinations(self, generative_prompt: str, normalized_prompt: str) -> Optional[str]:
+        """Genera un'immagine IA gratuita via Pollinations.ai e la converte in un MP4 Ken Burns."""
+        import urllib.parse
+        import subprocess
+        logger.info(f"🎨 Generazione Immagine IA (Pollinations) per: '{generative_prompt[:50]}...'")
+        
+        encoded_prompt = urllib.parse.quote(generative_prompt)
+        url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=1080&height=1920&nologo=true"
+        
+        image_path = os.path.join(self.temp_path, f"ai_img_{normalized_prompt}.jpg")
+        video_path = os.path.join(self.temp_path, f"ai_vid_{normalized_prompt}.mp4")
+        
+        try:
+            r = requests.get(url, timeout=30)
+            if r.status_code == 200:
+                with open(image_path, "wb") as f:
+                    f.write(r.content)
+                logger.info("Immagine IA scaricata! Animazione Ken Burns in corso...")
+                
+                ffmpeg_exe = "ffmpeg"
+                if os.name == 'nt' and os.path.exists("venv\\Scripts\\ffmpeg.exe"):
+                    ffmpeg_exe = "venv\\Scripts\\ffmpeg.exe"
+                    
+                cmd = [
+                    ffmpeg_exe, "-y", "-loop", "1", "-i", image_path,
+                    "-filter_complex", "zoompan=z='min(zoom+0.0015,1.10)':d=200:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)',format=yuv420p",
+                    "-c:v", "libx264", "-preset", "fast", "-crf", "20",
+                    "-t", "5", video_path
+                ]
+                subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                
+                if os.path.exists(video_path):
+                    cache_name = f"{normalized_prompt}_ai_1.mp4"
+                    cache_path = os.path.join(self.archive_path, cache_name)
+                    shutil.copy(video_path, cache_path)
+                    return cache_name
+            return None
+        except Exception as e:
+            logger.error(f"Errore Pollinations API: {e}")
+            return None
+
     def process_scene_broll(self, scene_id: int, prompt: str, current_timeline_sec: float, generative_3d_prompt: str = None) -> Optional[str]:
         """
         Cuore del Modulo Ibrido: Risolve la richiesta di B-Roll (prima Veo, poi Pexels)
@@ -135,16 +176,21 @@ class BRollManager:
         candidates = self._get_local_candidates(normalized_prompt)
         selected_filename = None
         
-        # 0. TENTATIVO GENERAZIONE AI (VEO)
-        if generative_3d_prompt and self.google_api_key:
-            # Tenta Generazione AI. Se restituisce un file lo usiamo, altrimenti proseguiamo (fallback)
-            veo_path = self._fetch_from_veo(generative_3d_prompt, normalized_prompt)
-            if veo_path:
-                # Gestione Veo riuscita
-                dest_filename = f"scene_{scene_id}_broll.mp4"
-                dest_path = os.path.join(self.temp_path, dest_filename)
-                shutil.copy(veo_path, dest_path)
-                return dest_path
+        # 0. TENTATIVO GENERAZIONE AI
+        if generative_3d_prompt:
+            if self.google_api_key:
+                veo_path = self._fetch_from_veo(generative_3d_prompt, normalized_prompt)
+                if veo_path:
+                    dest_filename = f"scene_{scene_id}_broll.mp4"
+                    dest_path = os.path.join(self.temp_path, dest_filename)
+                    shutil.copy(veo_path, dest_path)
+                    return dest_path
+                    
+            # Fallback 100% gratuito: Pollinations AI
+            if not selected_filename:
+                poll_filename = self._fetch_from_pollinations(generative_3d_prompt, normalized_prompt)
+                if poll_filename:
+                    selected_filename = poll_filename
         
         # 1. SMART CACHING & MEMORY BUFFER (Pexels)
         # Verifichiamo se esiste una clip in archivio che non viola i 15 secondi di girato

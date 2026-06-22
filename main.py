@@ -26,7 +26,7 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "gsk_FMRXKpfcgI3HBQx79WatWGdyb3FY6
 PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "1BBVi0DC0Zt5QhQG37RirCikK7zL2OYMJhXCHmV7ncORynDfvClYMZVj")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", get_google_api_key())
 
-async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callback=None, frontend_options: dict = None, telegram_token: str = "", telegram_chat_id: str = "") -> str:
+async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callback=None, frontend_options: dict = None, telegram_token: str = "", telegram_chat_id: str = "", voice_url: str = "") -> str:
     """Mode A: Zero-Touch Content Factory"""
     logger.info("=== MODE A: Avvio Pipeline ===")
     
@@ -47,7 +47,7 @@ async def process_mode_a(testo: str, format_ratio: str = "9:16", progress_callba
     testo_narrativo = " ".join([scene.get("text_segment", "") for scene in director_cut.get("scenes", [])])
     
     if progress_callback: progress_callback("Generazione Audio TTS...", 30)
-    await audio_engine.process_full_audio_pipeline(testo_narrativo)
+    await audio_engine.process_full_audio_pipeline(testo_narrativo, voice_url=voice_url)
     
     if progress_callback: progress_callback("Rendering Avatar Statico...", 40)
     avatar.render_avatar(vlog_mode=False)

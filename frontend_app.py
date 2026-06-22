@@ -260,10 +260,16 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("🔑 **Credenziali Cloud**")
 if "GITHUB_TOKEN" in st.secrets:
     sidebar_gh_token = st.secrets["GITHUB_TOKEN"]
-    st.sidebar.success("✅ Token di sistema attivo")
+    st.sidebar.success("✅ Token GitHub di sistema attivo")
 else:
-    sidebar_gh_token = st.sidebar.text_input("GitHub Token (se usi il sito online)", type="password", help="Inserisci il tuo token ghp_... per autorizzare il lancio da cloud.")
-    if not sidebar_gh_token:
+    sidebar_gh_token = st.sidebar.text_input("GitHub Token", type="password")
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("🎙️ **Clonazione Vocale (Opzionale)**")
+st.sidebar.markdown("Carica 10 secondi della tua voce per far leggere tutto il copione al tuo clone! (Usa formati corti per non rallentare l'avvio).")
+uploaded_voice = st.sidebar.file_uploader("Carica Audio", type=["mp3", "wav", "m4a", "ogg"])
+
+if not sidebar_gh_token:
         sidebar_gh_token = config.get("github_token", "")
 
 tg_chat_id = "6810865157"
@@ -325,7 +331,22 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                 
             import requests
             
-            # 1. Creiamo il Gist per la barra di progresso
+            # 1. Caricamento Voce
+            voice_url = ""
+            if uploaded_voice is not None:
+                st.info("⬆️ Caricamento della tua voce sul Cloud temporaneo...")
+                try:
+                    files = {'file': (uploaded_voice.name, uploaded_voice.getvalue())}
+                    # file.io offre upload gratuiti anonimi per un download singolo
+                    upload_res = requests.post("https://file.io", files=files, timeout=10)
+                    if upload_res.status_code == 200:
+                        voice_url = upload_res.json().get("link", "")
+                    else:
+                        st.warning("Impossibile caricare la voce. Verrà usata la voce sintetica di default.")
+                except Exception as e:
+                    st.warning(f"Errore caricamento voce: {e}")
+            
+            # 2. Creiamo il Gist per la barra di progresso
             gist_url = "https://api.github.com/gists"
             gist_headers = {
                 "Accept": "application/vnd.github.v3+json",
@@ -347,7 +368,7 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                 st.session_state.current_gist_id = gist_id
                 st.session_state.is_running = True
             
-            # 2. Avviamo Kaggle passando il Gist ID
+            # 3. Avviamo Kaggle passando il Gist ID e l'URL della voce
             url = f"https://api.github.com/repos/{GITHUB_REPO}/dispatches"
             headers = {
                 "Accept": "application/vnd.github.v3+json",
@@ -360,7 +381,8 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                     "text": advanced_payload,
                     "chat_id": tg_chat_id,
                     "github_token": GITHUB_TOKEN,
-                    "gist_id": gist_id
+                    "gist_id": gist_id,
+                    "voice_url": voice_url
                 }
             }
             

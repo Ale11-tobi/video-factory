@@ -51,6 +51,7 @@ async def run_cli():
     chat_id = None
     gh_token = None
     gist_id = None
+    voice_url = ""
     try:
         with open("config.json", "r") as f:
             config = json.load(f)
@@ -58,6 +59,7 @@ async def run_cli():
             chat_id = config.get("telegram_chat_id")
             gh_token = config.get("github_token")
             gist_id = config.get("gist_id")
+            voice_url = config.get("voice_url", "")
     except:
         pass
 
@@ -101,7 +103,7 @@ async def run_cli():
         if token and chat_id:
             send_telegram_progress(token, chat_id, "Inizio calcoli sulla GPU T4 di Kaggle...", 0)
             
-        final_video = await process_mode_a(testo, progress_callback=progress_handler, frontend_options=frontend_options)
+        final_video = await process_mode_a(testo, progress_callback=progress_handler, frontend_options=frontend_options, voice_url=voice_url)
         print(f"Video generato con successo in: {final_video}")
         
         if token and chat_id:
