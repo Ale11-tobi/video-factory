@@ -9,80 +9,86 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Kaggle API
-        run: pip install kaggle
+      - name: Install dependencies
+        run: pip install requests
 
-      - name: Setup Kaggle Credentials
+      - name: Prepare files and push to Kaggle
         env:
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          SCRIPT_TEXT: ${{ github.event.client_payload.text }}
+          CHAT_ID: ${{ github.event.client_payload.chat_id }}
         run: |
-          mkdir -p ~/.kaggle
-          mkdir -p ~/.config/kaggle
-          # Write access_token file for new KGAT tokens
-          echo "$KAGGLE_TOKEN" > ~/.kaggle/access_token
-          cp ~/.kaggle/access_token ~/.config/kaggle/access_token
-          chmod 600 ~/.kaggle/access_token ~/.config/kaggle/access_token
-          # Also write kaggle.json for old-style keys
-          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_TOKEN\"}" > ~/.kaggle/kaggle.json
-          cp ~/.kaggle/kaggle.json ~/.config/kaggle/kaggle.json
-          chmod 600 ~/.kaggle/kaggle.json ~/.config/kaggle/kaggle.json
+          python3 << 'PYEOF'
+          import requests, json, os
 
-      - name: Prepare Kaggle Deploy Folder
-        run: |
-          mkdir -p kaggle_deploy
-          
-          # Creiamo il file input.txt con il testo inviato da Telegram
-          cat << 'EOF' > kaggle_deploy/input_text.txt
-          ${{ github.event.client_payload.text }}
-          EOF
-          
-          # Creiamo config.json con il Chat ID che ha inviato il messaggio
-          cat << 'EOF' > kaggle_deploy/config.json
-          {
-            "telegram_bot_token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
-            "telegram_chat_id": "${{ github.event.client_payload.chat_id }}"
-          }
-          EOF
-          
-          # Creiamo lo script python che Kaggle eseguira sulla GPU
-          cat << 'EOF' > kaggle_deploy/run_video.py
+          token = os.environ["KAGGLE_TOKEN"]
+          username = os.environ["KAGGLE_USERNAME"]
+          script_text = os.environ.get("SCRIPT_TEXT", "test")
+          chat_id = os.environ.get("CHAT_ID", "")
+          tg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+
+          # Build the code that Kaggle will run on the GPU
+          code = f"""
           import os
+          # Write input text
+          with open("input_text.txt", "w") as f:
+              f.write('''{script_text}''')
+          # Write config
+          import json
+          config = {{"telegram_bot_token": "{tg_token}", "telegram_chat_id": "{chat_id}"}}
+          with open("config.json", "w") as f:
+              json.dump(config, f)
+          # Clone repo and run
           os.system("git clone https://github.com/Ale11-tobi/video-factory.git")
           os.chdir("video-factory")
           os.system("cp ../input_text.txt .")
           os.system("cp ../config.json .")
           os.system("sed -i '/TTS/d' requirements.txt")
           os.system("pip install -r requirements.txt")
-          os.system("python cli_runner.py input_text.txt")
-          EOF
-          
-          # Creiamo metadata per Kaggle
-          cat << 'EOF' > kaggle_deploy/kernel-metadata.json
-          {
-            "id": "${{ secrets.KAGGLE_USERNAME }}/video-factory-run",
-            "title": "Video Factory Run",
-            "code_file": "run_video.py",
-            "language": "python",
-            "kernel_type": "script",
-            "is_private": "true",
-            "enable_gpu": "true",
-            "enable_internet": "true",
-            "dataset_sources": [],
-            "competition_sources": [],
-            "kernel_sources": []
-          }
-          EOF
+          os.system("python cli_runner.py ../input_text.txt")
+          """
 
-      - name: Push to Kaggle
-        env:
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-          KAGGLE_KEY: ${{ secrets.KAGGLE_API_TOKEN }}
-        run: kaggle kernels push -p kaggle_deploy
+          # Push to Kaggle using Bearer token (new KGAT format)
+          headers = {
+              "Authorization": f"Bearer {token}",
+              "Content-Type": "application/json"
+          }
+
+          body = {
+              "slug": f"{username}/video-factory-run",
+              "newTitle": "Video Factory Run",
+              "text": code,
+              "language": "python",
+              "kernelType": "script",
+              "isPrivate": True,
+              "enableGpu": True,
+              "enableInternet": True,
+              "datasetDataSources": [],
+              "competitionDataSources": [],
+              "kernelDataSources": [],
+              "categoryIds": []
+          }
+
+          print("Pushing kernel to Kaggle...")
+          resp = requests.post(
+              "https://www.kaggle.com/api/v1/kernels/push",
+              headers=headers,
+              json=body
+          )
+          print(f"Status: {resp.status_code}")
+          print(f"Response: {resp.text}")
+
+          if resp.status_code != 200:
+              raise Exception(f"Kaggle push failed with status {resp.status_code}: {resp.text}")
+
+          print("Kernel pushed successfully!")
+          PYEOF
