@@ -63,17 +63,34 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 end_t = format_time(w["end"])
                 text = w["word"].upper().replace('"', '').replace("'", "")
                 
-                # Colore giallo per parole lunghe, verde per parole chiave, altrimenti bianco
                 color_tag = ""
-                if len(text) > 7:
+                emoji_event = ""
+                
+                word_clean = text.strip()
+                if len(word_clean) > 7:
                     color_tag = "\\c&H0000FFFF&" # Giallo
-                elif text in ["SPAZIALE", "INCREDIBILE", "ASSURDO", "SEGRETO"]:
+                elif word_clean in ["SPAZIALE", "INCREDIBILE", "ASSURDO", "SEGRETO", "BOMBA", "SOLDI", "GRATIS"]:
                     color_tag = "\\c&H0000FF00&" # Verde
+                    
+                    # Seleziona l'emoji in base alla parola
+                    emoji_char = "💥"
+                    if word_clean in ["SOLDI", "GRATIS"]: emoji_char = "💰"
+                    elif word_clean in ["SEGRETO"]: emoji_char = "🤫"
+                    elif word_clean in ["SPAZIALE", "INCREDIBILE"]: emoji_char = "🚀"
+                    
+                    # Calcola i tempi in millisecondi per l'animazione ASS
+                    dur_ms = int((w["end"] - w["start"]) * 1000)
+                    fade_out_start = max(100, dur_ms - 150)
+                    
+                    # Aggiunge l'emoji animata in alto (pos Y=self.h/3)
+                    emoji_event = f"Dialogue: 0,{start_t},{end_t},MrBeast,,0,0,0,,{{\\pos({self.w//2},{self.h//3})\\fscx0\\fscy0\\t(0,100,\\fscx250\\fscy250)\\t({fade_out_start},{dur_ms},\\fscx0\\fscy0)}}{emoji_char}\n"
                     
                 # Effetto Pop (Alex Hormozi style)
                 pop_effect = "{\\fscx80\\fscy80\\t(0,50,\\fscx110\\fscy110)\\t(50,150,\\fscx100\\fscy100)" + color_tag + "}"
                 
                 f.write(f"Dialogue: 0,{start_t},{end_t},MrBeast,,0,0,0,,{pop_effect}{text}\n")
+                if emoji_event:
+                    f.write(emoji_event)
 
     def _find_closest_beat(self, target_time: float, beats: List[float]) -> float:
         if not beats:
@@ -154,9 +171,29 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 end_t = cut_times[i+1]
                 duration = end_t - start_t
                 
+                # --- HOOK ZONE (First 30 seconds) ---
+                is_hook_zone = start_t < 30.0
+                
+                if is_hook_zone:
+                    # Dynamic Camera: alternate between slow zoom and slight scale
+                    if i % 2 == 0:
+                        # Slow zoom in
+                        cam_effect = f"scale={int(self.w*1.5)}:{int(self.h*1.5)},zoompan=z='min(zoom+0.0015,1.15)':d={int(duration*25)}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)',"
+                    else:
+                        # Close-up (scaled up static, focus on upper half for faces)
+                        cam_effect = f"scale={int(self.w*1.3)}:{int(self.h*1.3)},crop={self.w}:{self.h}:(in_w-out_w)/2:(in_h-out_h)/4,"
+                else:
+                    cam_effect = f"scale={self.w}:{self.h}:force_original_aspect_ratio=increase,"
+                    
+                if is_hook_zone and i > 0:
+                    # Aggiungiamo un leggero flash cinematico all'inizio della clip per mascherare il taglio
+                    flash_effect = ",eq=brightness='if(between(t,0,0.15), 0.3 - (t/0.15)*0.3, 0)'"
+                else:
+                    flash_effect = ""
+                
                 filter_complex.append(
-                    f"[{broll_idx}:v]scale={self.w}:{self.h}:force_original_aspect_ratio=increase,"
-                    f"crop={self.w}:{self.h},setsar=1,trim=0:{duration},setpts=PTS-STARTPTS[b{broll_idx}];"
+                    f"[{broll_idx}:v]{cam_effect}"
+                    f"crop={self.w}:{self.h},setsar=1,trim=0:{duration},setpts=PTS-STARTPTS{flash_effect}[b{broll_idx}];"
                 )
                 
                 next_overlay = f"[ov{broll_idx}]"
