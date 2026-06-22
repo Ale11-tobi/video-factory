@@ -199,3 +199,4 @@ class AvatarEngine:
         logger.info(f"Uso Ken Burns fallback per segmento {segment_id}")
         shutil.copy(base_video, segment_video)
         return segment_video
+
