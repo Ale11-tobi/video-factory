@@ -20,10 +20,18 @@ jobs:
         run: pip install kaggle
 
       - name: Setup Kaggle Credentials
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
         run: |
           mkdir -p ~/.kaggle
           mkdir -p ~/.config/kaggle
-          echo '{"username":"${{ secrets.KAGGLE_USERNAME }}","key":"${{ secrets.KAGGLE_API_TOKEN }}"}' > ~/.kaggle/kaggle.json
+          # Write access_token file for new KGAT tokens
+          echo "$KAGGLE_TOKEN" > ~/.kaggle/access_token
+          cp ~/.kaggle/access_token ~/.config/kaggle/access_token
+          chmod 600 ~/.kaggle/access_token ~/.config/kaggle/access_token
+          # Also write kaggle.json for old-style keys
+          echo "{\"username\":\"$KAGGLE_USERNAME\",\"key\":\"$KAGGLE_TOKEN\"}" > ~/.kaggle/kaggle.json
           cp ~/.kaggle/kaggle.json ~/.config/kaggle/kaggle.json
           chmod 600 ~/.kaggle/kaggle.json ~/.config/kaggle/kaggle.json
 
@@ -74,4 +82,7 @@ jobs:
           EOF
 
       - name: Push to Kaggle
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_API_TOKEN }}
         run: kaggle kernels push -p kaggle_deploy
