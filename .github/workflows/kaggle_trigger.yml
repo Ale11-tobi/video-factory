@@ -60,6 +60,7 @@ jobs:
           os.system("cp ../config.json .")
           import subprocess
           subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)
+          subprocess.run(["pip", "install", "flash-attn", "--no-build-isolation"], check=True)
           subprocess.run(["python", "cli_runner.py", "../input_text.txt"], check=True)
           """
 

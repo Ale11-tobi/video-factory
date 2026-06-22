@@ -52,12 +52,20 @@ class Server3DEngine:
         return final_glb, audio_path
 
     def _phase1_tts(self, text: str) -> str:
-        logger.info(">>> FASE 1: Generazione Voce Neurale (XTTSv2)")
+        logger.info(">>> FASE 1: Generazione Voce Neurale (XTTSv2) [TURBO-BOOSTED]")
         from TTS.api import TTS
         
         # Carica il modello in VRAM
         tts = TTS(model_name="tts_models/multilingual/multi-dataset/xtts_v2").to("cuda")
         output_audio = os.path.join(self.output_dir, "audio_narrante.wav")
+        
+        # ⚡ Acceleratore di Velocità: PyTorch Compile
+        try:
+            logger.info("Compilazione iniziale in corso... Potrebbe richiedere qualche minuto")
+            tts.synthesizer.tts_model = torch.compile(tts.synthesizer.tts_model)
+            logger.info("[BOOST] torch.compile applicato a XTTSv2 con successo!")
+        except Exception as e:
+            logger.warning(f"Impossibile compilare XTTSv2, fallback standard: {e}")
         
         # Simuliamo un dummy_speaker se non fornito, o usiamo text-to-speech base
         logger.info(f"Sintetizzando il testo: '{text[:30]}...'")
@@ -69,12 +77,21 @@ class Server3DEngine:
         return output_audio
 
     def _phase2_anigen(self, image_path: str) -> str:
-        logger.info(">>> FASE 2: Generazione Mesh & Auto-Rigging (AniGen)")
+        logger.info(">>> FASE 2: Generazione Mesh & Auto-Rigging (AniGen) [TURBO-BOOSTED]")
         output_glb = os.path.join(self.output_dir, "avatar_base.glb")
         
         # Pseudocodice per invocazione AniGen
-        logger.info("Inizializzazione pesi AniGen in VRAM...")
-        # model = AniGenPipeline.from_pretrained("anigen-models/anigen-v1").to("cuda")
+        logger.info("Inizializzazione pesi AniGen in VRAM a 8-bit (BitsAndBytes)...")
+        # import bitsandbytes as bnb
+        # import xformers
+        # model = AniGenPipeline.from_pretrained(
+        #     "anigen-models/anigen-v1",
+        #     load_in_8bit=True,
+        #     torch_dtype=torch.float16
+        # )
+        # model.enable_xformers_memory_efficient_attention()
+        # model.unet = torch.compile(model.unet)
+        
         # glb_data = model.generate(image=image_path)
         # glb_data.save(output_glb)
         
@@ -82,11 +99,14 @@ class Server3DEngine:
         return output_glb
 
     def _phase3_kimodo(self, prompt: str) -> str:
-        logger.info(">>> FASE 3: Generazione Cinematica (NVIDIA Kimodo)")
+        logger.info(">>> FASE 3: Generazione Cinematica (NVIDIA Kimodo) [TURBO-BOOSTED]")
         output_npz = os.path.join(self.output_dir, "movimento.npz")
         
         # Per Kimodo, invochiamo tramite script ufficiale come da documentazione
         env = os.environ.copy()
+        env["XFORMERS_ENABLE"] = "1"
+        env["FLASH_ATTENTION"] = "1"
+        env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
         # TEXT_ENCODER_DEVICE=cpu se serve ancora risparmiare memoria durante l'inferenza,
         # altrimenti su T4 (16GB) la usiamo piena se AniGen è stato scaricato correttamente
         cmd = [

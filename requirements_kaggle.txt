@@ -8,3 +8,7 @@ TTS
 torch
 torchaudio
 accelerate
+tensorrt
+xformers
+bitsandbytes
+flash-attn
