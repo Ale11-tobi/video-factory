@@ -103,16 +103,22 @@ st.markdown("""
     /* Ottimizzazione iPhone / Mobile */
     @media (max-width: 768px) {
         .main-title {
-            font-size: 2.2rem !important;
+            font-size: 2rem !important;
             line-height: 1.2;
             margin-top: 1rem;
         }
         .stButton>button {
             font-size: 1rem !important;
             padding: 0.8rem 1rem;
+            width: 100% !important;
         }
         .stApp {
-            padding: 0px !important;
+            padding: 5px !important;
+        }
+        /* Fix per i tab che sbordano su mobile */
+        .stTabs [data-baseweb="tab-list"] {
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
         }
     }
     
@@ -252,10 +258,13 @@ st.sidebar.markdown("Il sito è la vetrina. Kaggle è il motore.")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("🔑 **Credenziali Cloud**")
-sidebar_gh_token = st.sidebar.text_input("GitHub Token (se usi il sito online)", type="password", help="Inserisci il tuo token ghp_... per autorizzare il lancio da cloud.")
-if not sidebar_gh_token:
-    # Se vuoto, provo a caricarlo da config.json se esiste (per quando lo usi in locale)
-    sidebar_gh_token = config.get("github_token", "")
+if "GITHUB_TOKEN" in st.secrets:
+    sidebar_gh_token = st.secrets["GITHUB_TOKEN"]
+    st.sidebar.success("✅ Token di sistema attivo")
+else:
+    sidebar_gh_token = st.sidebar.text_input("GitHub Token (se usi il sito online)", type="password", help="Inserisci il tuo token ghp_... per autorizzare il lancio da cloud.")
+    if not sidebar_gh_token:
+        sidebar_gh_token = config.get("github_token", "")
 
 tg_chat_id = "6810865157"
 
