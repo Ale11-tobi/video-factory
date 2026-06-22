@@ -12,8 +12,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🎬 Bot Centrale attivato!\n\n"
         "Questo bot comunica direttamente con GitHub Actions, che a sua volta accenderà le GPU di Kaggle per te.\n\n"
-        "Scrivi `Genera: [testo]` per avviare l'elaborazione a PC spento."
+        "Scrivi `Genera: [testo]` per avviare l'elaborazione a PC spento.\n"
+        "Scrivi `/accendi` per svegliare la vetrina del sito se si è addormentata."
     )
+
+async def accendi(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("⏳ Invio la 'sveglia' al sito su Hugging Face...")
+    url = "https://huggingface.co/spaces/02Ale11x/ales_video_editor"
+    try:
+        requests.get(url, timeout=5)
+        await update.message.reply_text(f"✅ Sito sveglio e operativo!\n\nAprilo qui: {url}")
+    except requests.exceptions.Timeout:
+        await update.message.reply_text(f"✅ Sveglia inviata con successo! Il server ci metterà 1-2 minuti ad avviarsi del tutto.\n\nTra poco sarà online qui: {url}")
+    except Exception as e:
+        await update.message.reply_text(f"❌ Errore di rete: {e}")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text
@@ -56,6 +68,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("accendi", accendi))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     print("Bot avviato! In ascolto per inviare segnali a GitHub...")
     app.run_polling()

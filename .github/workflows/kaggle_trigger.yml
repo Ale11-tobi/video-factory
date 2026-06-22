@@ -52,8 +52,8 @@ jobs:
           os.chdir("video-factory")
           os.system("cp ../input_text.txt .")
           os.system("cp ../config.json .")
-          os.system("sed -i '/TTS/d' requirements.txt")
-          os.system("pip install -r requirements.txt")
+          os.system("sed -i '/TTS/d' requirements_kaggle.txt")
+          os.system("pip install -r requirements_kaggle.txt")
           os.system("python cli_runner.py ../input_text.txt")
           """
 
