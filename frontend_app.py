@@ -130,7 +130,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 3. SEGRETI E CONFIGURAZIONI ---
-GITHUB_TOKEN = "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"
 GITHUB_REPO = "Ale11-tobi/video-factory"
 CONFIG_FILE = "config.json"
 HISTORY_FILE = "history.json"
@@ -140,10 +139,13 @@ def load_config():
         try:
             with open(CONFIG_FILE, "r") as f: return json.load(f)
         except: pass
-    return {"tg_chat_id": ""}
+    return {"tg_chat_id": "", "github_token": ""}
 
-def save_config(chat_id):
-    with open(CONFIG_FILE, "w") as f: json.dump({"tg_chat_id": chat_id}, f)
+def save_config(chat_id, gh_token=""):
+    config = load_config()
+    config["tg_chat_id"] = chat_id
+    if gh_token: config["github_token"] = gh_token
+    with open(CONFIG_FILE, "w") as f: json.dump(config, f)
 
 def load_history():
     if os.path.exists(HISTORY_FILE):
@@ -248,6 +250,13 @@ st.markdown("---")
 st.sidebar.title("🚀 Console di Lancio")
 st.sidebar.markdown("Il sito è la vetrina. Kaggle è il motore.")
 
+st.sidebar.markdown("---")
+st.sidebar.markdown("🔑 **Credenziali Cloud**")
+sidebar_gh_token = st.sidebar.text_input("GitHub Token (se usi il sito online)", type="password", help="Inserisci il tuo token ghp_... per autorizzare il lancio da cloud.")
+if not sidebar_gh_token:
+    # Se vuoto, provo a caricarlo da config.json se esiste (per quando lo usi in locale)
+    sidebar_gh_token = config.get("github_token", "")
+
 tg_chat_id = "6810865157"
 
 st.sidebar.markdown("---")
@@ -300,6 +309,11 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
 {st.session_state.user_text}
 """
             
+            GITHUB_TOKEN = sidebar_gh_token
+            if not GITHUB_TOKEN:
+                st.error("⚠️ Token GitHub mancante! Inseriscilo nella barra laterale a sinistra.")
+                st.stop()
+                
             url = f"https://api.github.com/repos/{GITHUB_REPO}/dispatches"
             headers = {
                 "Accept": "application/vnd.github.v3+json",
