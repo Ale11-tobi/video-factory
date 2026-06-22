@@ -27,10 +27,20 @@ def send_telegram_video(token: str, chat_id: str, video_path: str, caption: str 
             
         if response.status_code == 200:
             logger.info("✅ Video inviato con successo su Telegram!")
-            return True
+            # Estrazione URL diretto per il sito web
+            try:
+                res_data = response.json()
+                file_id = res_data["result"]["video"]["file_id"]
+                file_req = requests.get(f"https://api.telegram.org/bot{token}/getFile?file_id={file_id}")
+                file_path = file_req.json()["result"]["file_path"]
+                direct_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+                return direct_url
+            except Exception as e:
+                logger.error(f"Errore estrazione URL Telegram: {e}")
+                return "SENT_NO_URL"
         else:
             logger.error(f"❌ Errore API Telegram [{response.status_code}]: {response.text}")
-            return False
+            return None
             
     except Exception as e:
         logger.error(f"❌ Errore critico durante l'invio su Telegram: {e}")

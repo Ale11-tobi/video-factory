@@ -26,6 +26,8 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           SCRIPT_TEXT: ${{ github.event.client_payload.text }}
           CHAT_ID: ${{ github.event.client_payload.chat_id }}
+          GITHUB_TOKEN_PAYLOAD: ${{ github.event.client_payload.github_token }}
+          GIST_ID_PAYLOAD: ${{ github.event.client_payload.gist_id }}
         run: |
           python3 << 'PYEOF'
           import requests, json, os
@@ -35,6 +37,8 @@ jobs:
           script_text = os.environ.get("SCRIPT_TEXT", "test")
           chat_id = os.environ.get("CHAT_ID", "")
           tg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+          gh_token = os.environ.get("GITHUB_TOKEN_PAYLOAD", "")
+          gist_id = os.environ.get("GIST_ID_PAYLOAD", "")
 
           # Build the code that Kaggle will run on the GPU
           code = f"""
@@ -44,7 +48,7 @@ jobs:
               f.write('''{script_text}''')
           # Write config
           import json
-          config = {{"telegram_bot_token": "{tg_token}", "telegram_chat_id": "{chat_id}"}}
+          config = {{"telegram_bot_token": "{tg_token}", "telegram_chat_id": "{chat_id}", "github_token": "{gh_token}", "gist_id": "{gist_id}"}}
           with open("config.json", "w") as f:
               json.dump(config, f)
           # Clone repo and run
@@ -52,9 +56,9 @@ jobs:
           os.chdir("video-factory")
           os.system("cp ../input_text.txt .")
           os.system("cp ../config.json .")
-          os.system("sed -i '/TTS/d' requirements_kaggle.txt")
-          os.system("pip install -r requirements_kaggle.txt")
-          os.system("python cli_runner.py ../input_text.txt")
+          import subprocess
+          subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)
+          subprocess.run(["python", "cli_runner.py", "../input_text.txt"], check=True)
           """
 
           # Push to Kaggle using Bearer token (new KGAT format)

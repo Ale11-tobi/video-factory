@@ -323,16 +323,44 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                 st.error("⚠️ Token GitHub mancante! Inseriscilo nella barra laterale a sinistra.")
                 st.stop()
                 
+            import requests
+            
+            # 1. Creiamo il Gist per la barra di progresso
+            gist_url = "https://api.github.com/gists"
+            gist_headers = {
+                "Accept": "application/vnd.github.v3+json",
+                "Authorization": f"token {GITHUB_TOKEN}"
+            }
+            gist_data = {
+                "description": "Video Factory Progress Tracking",
+                "public": False,
+                "files": {
+                    "progress.json": {
+                        "content": '{"status": "Inizializzazione server Kaggle in corso (Attendi 15-20 secondi)...", "progress": 0, "eta": "Calcolo in corso...", "video_url": ""}'
+                    }
+                }
+            }
+            gist_response = requests.post(gist_url, headers=gist_headers, json=gist_data)
+            gist_id = ""
+            if gist_response.status_code == 201:
+                gist_id = gist_response.json().get("id", "")
+                st.session_state.current_gist_id = gist_id
+                st.session_state.is_running = True
+            
+            # 2. Avviamo Kaggle passando il Gist ID
             url = f"https://api.github.com/repos/{GITHUB_REPO}/dispatches"
             headers = {
                 "Accept": "application/vnd.github.v3+json",
                 "Authorization": f"token {GITHUB_TOKEN}"
             }
+            
             data = {
                 "event_type": "trigger_kaggle",
                 "client_payload": {
                     "text": advanced_payload,
-                    "chat_id": tg_chat_id
+                    "chat_id": tg_chat_id,
+                    "github_token": GITHUB_TOKEN,
+                    "gist_id": gist_id
                 }
             }
             
@@ -340,9 +368,6 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                 resp = requests.post(url, headers=headers, json=data)
                 if resp.status_code == 204:
                     st.success("✅ CONNESSIONE STABILITA! I server Kaggle si sono accesi.")
-                    st.info("📱 Controlla Telegram! Stai per ricevere gli aggiornamenti in tempo reale.")
-                    st.markdown("[👀 Guarda la Console di Kaggle in Diretta](https://www.kaggle.com/code/alessandroiovine/video-factory-run/log)")
-                    st.balloons()
                     
                     # Salva nella history
                     record = {
@@ -355,6 +380,44 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                     }
                     append_history(record)
                     
+                    # Polling Loop per barra di progresso
+                    st.markdown("---")
+                    st.subheader("⚙️ Progresso Generazione in Diretta")
+                    prog_bar = st.progress(0)
+                    status_text = st.empty()
+                    eta_text = st.empty()
+                    video_container = st.empty()
+                    
+                    import time
+                    import json
+                    while st.session_state.is_running:
+                        time.sleep(3)
+                        try:
+                            g_res = requests.get(f"https://api.github.com/gists/{gist_id}", headers={"Authorization": f"token {GITHUB_TOKEN}"})
+                            if g_res.status_code == 200:
+                                files = g_res.json().get("files", {})
+                                if "progress.json" in files:
+                                    content = files["progress.json"]["content"]
+                                    p_data = json.loads(content)
+                                    prog_bar.progress(int(p_data.get("progress", 0)))
+                                    status_text.markdown(f"**Stato:** {p_data.get('status', '')}")
+                                    eta_text.markdown(f"⏳ **Tempo Stimato:** {p_data.get('eta', '')}")
+                                    
+                                    if p_data.get("video_url"):
+                                        st.session_state.is_running = False
+                                        prog_bar.progress(100)
+                                        status_text.success("✅ Generazione completata con successo!")
+                                        st.balloons()
+                                        video_container.video(p_data["video_url"])
+                                        st.markdown(f"[📥 Scarica Video Originale]({p_data['video_url']})")
+                                        break
+                                    if p_data.get("progress") == 100 and not p_data.get("video_url"):
+                                        st.session_state.is_running = False
+                                        prog_bar.progress(100)
+                                        status_text.error("⚠️ Il video è finito ma non è stato possibile recuperare il link. Controlla Telegram.")
+                                        break
+                        except Exception as e:
+                            pass
                 else:
                     st.error(f"❌ Errore Backend ({resp.status_code}): {resp.text}")
             except Exception as e:

@@ -2,11 +2,5 @@ streamlit
 requests
 faster-whisper
 edge-tts
-TTS
-torch
-torchvision
-torchaudio
-xformers
-bitsandbytes
-accelerate
-huggingface_hub
+groq
+tenacity
