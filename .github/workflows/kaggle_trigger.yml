@@ -59,16 +59,17 @@ jobs:
           os.system("cp ../input_text.txt .")
           os.system("cp ../config.json .")
           import subprocess
+          import requests
           
           # Aggiorna il Gist per avvisare l'utente della compilazione Turbo-Boost
           gist_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Compilazione Turbo-Boost in corso (TensorRT & xformers). Richiede ~1-2 min...", "progress": 2, "eta": "Compilazione...", "video_url": ""}})}}}}}})
-          requests.patch(f"https://api.github.com/gists/{{gist_id}}", headers={{"Authorization": f"token {{gh_token}}"}}, data=gist_payload)
+          requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload)
           
           subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)
           
           # Aggiorna il Gist post-compilazione
           gist_payload_done = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Turbo-Boost Attivo! Avvio motore AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""}})}}}}}})
-          requests.patch(f"https://api.github.com/gists/{{gist_id}}", headers={{"Authorization": f"token {{gh_token}}"}}, data=gist_payload_done)
+          requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload_done)
           
           subprocess.run(["python", "cli_runner.py", "../input_text.txt"], check=True)
           """
