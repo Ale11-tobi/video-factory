@@ -62,7 +62,7 @@ jobs:
           import requests
           
           # Aggiorna il Gist per avvisare l'utente della compilazione Turbo-Boost
-          gist_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Compilazione Turbo-Boost in corso (TensorRT & xformers). Richiede ~1-2 min...", "progress": 2, "eta": "Compilazione...", "video_url": ""}})}}}}}})
+          gist_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Compilazione Turbo-Boost in corso (TensorRT). Richiede ~1 min...", "progress": 2, "eta": "Compilazione...", "video_url": ""}})}}}}}})
           requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload)
           
           subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)

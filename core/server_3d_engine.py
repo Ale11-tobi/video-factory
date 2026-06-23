@@ -104,7 +104,6 @@ class Server3DEngine:
         
         # Per Kimodo, invochiamo tramite script ufficiale come da documentazione
         env = os.environ.copy()
-        env["XFORMERS_ENABLE"] = "1"
         env["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
         # TEXT_ENCODER_DEVICE=cpu se serve ancora risparmiare memoria durante l'inferenza,
         # altrimenti su T4 (16GB) la usiamo piena se AniGen è stato scaricato correttamente
