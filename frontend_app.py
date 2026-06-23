@@ -370,6 +370,9 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                 gist_id = gist_response.json().get("id", "")
                 st.session_state.current_gist_id = gist_id
                 st.session_state.is_running = True
+            else:
+                st.error(f"⚠️ Errore creazione Gist ({gist_response.status_code}). Verifica che il Token GitHub abbia i permessi 'gist'.")
+                st.session_state.is_running = False
             
             # 3. Avviamo Kaggle passando il Gist ID e l'URL della voce
             url = f"https://api.github.com/repos/{GITHUB_REPO}/dispatches"
@@ -441,8 +444,11 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                                         prog_bar.progress(100)
                                         status_text.error("⚠️ Il video è finito ma non è stato possibile recuperare il link. Controlla Telegram.")
                                         break
+                            else:
+                                status_text.warning(f"Attendendo il server... (Gist Status: {g_res.status_code})")
                         except Exception as e:
-                            pass
+                            status_text.error(f"Errore di lettura Gist: {e}")
+                            time.sleep(2)
                 else:
                     st.error(f"❌ Errore Backend ({resp.status_code}): {resp.text}")
             except Exception as e:
