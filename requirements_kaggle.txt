@@ -11,4 +11,3 @@ accelerate
 tensorrt
 xformers
 bitsandbytes
-flash-attn

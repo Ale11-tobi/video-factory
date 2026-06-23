@@ -61,11 +61,10 @@ jobs:
           import subprocess
           
           # Aggiorna il Gist per avvisare l'utente della compilazione Turbo-Boost
-          gist_payload = json.dumps({"files": {"progress.json": {"content": json.dumps({"status": "Compilazione Turbo-Boost in corso (TensorRT & Flash-Attn). Richiede ~5-10 min...", "progress": 2, "eta": "Compilazione CUDA...", "video_url": ""})}}})
+          gist_payload = json.dumps({"files": {"progress.json": {"content": json.dumps({"status": "Compilazione Turbo-Boost in corso (TensorRT & xformers). Richiede ~1-2 min...", "progress": 2, "eta": "Compilazione...", "video_url": ""})}}})
           requests.patch(f"https://api.github.com/gists/{gist_id}", headers={"Authorization": f"token {gh_token}"}, data=gist_payload)
           
           subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)
-          subprocess.run(["pip", "install", "flash-attn", "--no-build-isolation"], check=True)
           
           # Aggiorna il Gist post-compilazione
           gist_payload_done = json.dumps({"files": {"progress.json": {"content": json.dumps({"status": "Turbo-Boost Attivo! Avvio motore AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""})}}})
