@@ -1,0 +1,367 @@
+ï»¿2026-06-23T11:31:03.8593643Z Current runner version: '2.335.1'
+2026-06-23T11:31:03.8621565Z ##[group]Runner Image Provisioner
+2026-06-23T11:31:03.8622455Z Hosted Compute Agent
+2026-06-23T11:31:03.8623147Z Version: 20260611.554
+2026-06-23T11:31:03.8623851Z Commit: 5e0782fdc9014723d3be820dd114dd31555c2bd1
+2026-06-23T11:31:03.8624598Z Build Date: 2026-06-11T21:40:46Z
+2026-06-23T11:31:03.8625845Z Worker ID: {40d9b953-5312-48fd-9cad-63f26d881e60}
+2026-06-23T11:31:03.8627001Z Azure Region: eastus
+2026-06-23T11:31:03.8627684Z ##[endgroup]
+2026-06-23T11:31:03.8629282Z ##[group]Operating System
+2026-06-23T11:31:03.8630060Z Ubuntu
+2026-06-23T11:31:03.8630632Z 24.04.4
+2026-06-23T11:31:03.8631240Z LTS
+2026-06-23T11:31:03.8631867Z ##[endgroup]
+2026-06-23T11:31:03.8632481Z ##[group]Runner Image
+2026-06-23T11:31:03.8633496Z Image: ubuntu-24.04
+2026-06-23T11:31:03.8634158Z Version: 20260615.205.1
+2026-06-23T11:31:03.8635608Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260615.205/images/ubuntu/Ubuntu2404-Readme.md
+2026-06-23T11:31:03.8637523Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260615.205
+2026-06-23T11:31:03.8638677Z ##[endgroup]
+2026-06-23T11:31:03.8639929Z ##[group]GITHUB_TOKEN Permissions
+2026-06-23T11:31:03.8642161Z Contents: read
+2026-06-23T11:31:03.8642864Z Metadata: read
+2026-06-23T11:31:03.8643509Z Packages: read
+2026-06-23T11:31:03.8644105Z ##[endgroup]
+2026-06-23T11:31:03.8646566Z Secret source: Actions
+2026-06-23T11:31:03.8647825Z Prepare workflow directory
+2026-06-23T11:31:03.8985140Z Prepare all required actions
+2026-06-23T11:31:03.9023207Z Getting action download info
+2026-06-23T11:31:04.1988563Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+2026-06-23T11:31:04.2745183Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-06-23T11:31:04.4993910Z Complete job name: run-kaggle
+2026-06-23T11:31:04.5740201Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T11:31:04.5749402Z ##[group]Run actions/checkout@v4
+2026-06-23T11:31:04.5750201Z with:
+2026-06-23T11:31:04.5750707Z   repository: Ale11-tobi/video-factory
+2026-06-23T11:31:04.5756410Z   token: ***
+2026-06-23T11:31:04.5756909Z   ssh-strict: true
+2026-06-23T11:31:04.5757394Z   ssh-user: git
+2026-06-23T11:31:04.5757892Z   persist-credentials: true
+2026-06-23T11:31:04.5758437Z   clean: true
+2026-06-23T11:31:04.5758940Z   sparse-checkout-cone-mode: true
+2026-06-23T11:31:04.5759523Z   fetch-depth: 1
+2026-06-23T11:31:04.5760015Z   fetch-tags: false
+2026-06-23T11:31:04.5760518Z   show-progress: true
+2026-06-23T11:31:04.5761024Z   lfs: false
+2026-06-23T11:31:04.5761529Z   submodules: false
+2026-06-23T11:31:04.5762038Z   set-safe-directory: true
+2026-06-23T11:31:04.5762857Z ##[endgroup]
+2026-06-23T11:31:04.6829374Z Syncing repository: Ale11-tobi/video-factory
+2026-06-23T11:31:04.6831480Z ##[group]Getting Git version info
+2026-06-23T11:31:04.6832343Z Working directory is '/home/runner/work/video-factory/video-factory'
+2026-06-23T11:31:04.6833600Z [command]/usr/bin/git version
+2026-06-23T11:31:04.6886959Z git version 2.54.0
+2026-06-23T11:31:04.6909951Z ##[endgroup]
+2026-06-23T11:31:04.6924942Z Temporarily overriding HOME='/home/runner/work/_temp/37b564c0-2f6c-44ab-95e0-05f3f37b2b01' before making global git config changes
+2026-06-23T11:31:04.6927872Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-23T11:31:04.6931197Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/video-factory/video-factory
+2026-06-23T11:31:04.6982425Z Deleting the contents of '/home/runner/work/video-factory/video-factory'
+2026-06-23T11:31:04.6986786Z ##[group]Initializing the repository
+2026-06-23T11:31:04.6991324Z [command]/usr/bin/git init /home/runner/work/video-factory/video-factory
+2026-06-23T11:31:04.7089474Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-06-23T11:31:04.7091100Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-06-23T11:31:04.7092528Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-06-23T11:31:04.7093826Z hint: call:
+2026-06-23T11:31:04.7094783Z hint:
+2026-06-23T11:31:04.7095968Z hint: 	git config --global init.defaultBranch <name>
+2026-06-23T11:31:04.7097228Z hint:
+2026-06-23T11:31:04.7098508Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-06-23T11:31:04.7099943Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-06-23T11:31:04.7101013Z hint:
+2026-06-23T11:31:04.7101851Z hint: 	git branch -m <name>
+2026-06-23T11:31:04.7102966Z hint:
+2026-06-23T11:31:04.7103915Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-06-23T11:31:04.7105282Z Initialized empty Git repository in /home/runner/work/video-factory/video-factory/.git/
+2026-06-23T11:31:04.7108362Z [command]/usr/bin/git remote add origin https://github.com/Ale11-tobi/video-factory
+2026-06-23T11:31:04.7151265Z ##[endgroup]
+2026-06-23T11:31:04.7152656Z ##[group]Disabling automatic garbage collection
+2026-06-23T11:31:04.7154576Z [command]/usr/bin/git config --local gc.auto 0
+2026-06-23T11:31:04.7186431Z ##[endgroup]
+2026-06-23T11:31:04.7188023Z ##[group]Setting up auth
+2026-06-23T11:31:04.7193043Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-06-23T11:31:04.7228110Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-06-23T11:31:04.7559435Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-23T11:31:04.7590560Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-06-23T11:31:04.7808822Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-23T11:31:04.7840781Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-06-23T11:31:04.8060024Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-06-23T11:31:04.8093636Z ##[endgroup]
+2026-06-23T11:31:04.8094625Z ##[group]Fetching the repository
+2026-06-23T11:31:04.8103178Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +32a24d9d9f37795b40a0fc007e6b93093b0116cb:refs/remotes/origin/main
+2026-06-23T11:31:05.0403033Z From https://github.com/Ale11-tobi/video-factory
+2026-06-23T11:31:05.0404430Z  * [new ref]         32a24d9d9f37795b40a0fc007e6b93093b0116cb -> origin/main
+2026-06-23T11:31:05.0440747Z ##[endgroup]
+2026-06-23T11:31:05.0442420Z ##[group]Determining the checkout info
+2026-06-23T11:31:05.0444327Z ##[endgroup]
+2026-06-23T11:31:05.0450172Z [command]/usr/bin/git sparse-checkout disable
+2026-06-23T11:31:05.0509231Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-06-23T11:31:05.0538775Z ##[group]Checking out the ref
+2026-06-23T11:31:05.0543327Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-06-23T11:31:05.6398463Z Switched to a new branch 'main'
+2026-06-23T11:31:05.6401204Z branch 'main' set up to track 'origin/main'.
+2026-06-23T11:31:05.6660453Z ##[endgroup]
+2026-06-23T11:31:05.6715338Z [command]/usr/bin/git log -1 --format=%H
+2026-06-23T11:31:05.6741331Z 32a24d9d9f37795b40a0fc007e6b93093b0116cb
+2026-06-23T11:31:05.7110687Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T11:31:05.7117103Z ##[group]Run actions/setup-python@v5
+2026-06-23T11:31:05.7118262Z with:
+2026-06-23T11:31:05.7119092Z   python-version: 3.10
+2026-06-23T11:31:05.7120080Z   check-latest: false
+2026-06-23T11:31:05.7132556Z   token: ***
+2026-06-23T11:31:05.7133471Z   update-environment: true
+2026-06-23T11:31:05.7134529Z   allow-prereleases: false
+2026-06-23T11:31:05.7135553Z   freethreaded: false
+2026-06-23T11:31:05.7136643Z ##[endgroup]
+2026-06-23T11:31:05.8479573Z ##[group]Installed versions
+2026-06-23T11:31:05.8582268Z (node:2321) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-06-23T11:31:05.8587112Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-06-23T11:31:05.8589843Z Successfully set up CPython (3.10.20)
+2026-06-23T11:31:05.8592097Z ##[endgroup]
+2026-06-23T11:31:05.8851338Z ##[group]Run pip install requests
+2026-06-23T11:31:05.8852661Z [36;1mpip install requests[0m
+2026-06-23T11:31:05.9032642Z shell: /usr/bin/bash -e {0}
+2026-06-23T11:31:05.9034047Z env:
+2026-06-23T11:31:05.9035447Z   pythonLocation: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:05.9038207Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.10.20/x64/lib/pkgconfig
+2026-06-23T11:31:05.9040656Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:05.9042713Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:05.9044699Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:05.9046957Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.10.20/x64/lib
+2026-06-23T11:31:05.9048664Z ##[endgroup]
+2026-06-23T11:31:06.7823994Z Collecting requests
+2026-06-23T11:31:06.8464066Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-06-23T11:31:06.9764503Z Collecting charset_normalizer<4,>=2 (from requests)
+2026-06-23T11:31:06.9810285Z   Downloading charset_normalizer-3.4.7-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+2026-06-23T11:31:07.0075142Z Collecting idna<4,>=2.5 (from requests)
+2026-06-23T11:31:07.0117644Z   Downloading idna-3.18-py3-none-any.whl.metadata (6.1 kB)
+2026-06-23T11:31:07.0369543Z Collecting urllib3<3,>=1.26 (from requests)
+2026-06-23T11:31:07.0413070Z   Downloading urllib3-2.7.0-py3-none-any.whl.metadata (6.9 kB)
+2026-06-23T11:31:07.0623352Z Collecting certifi>=2023.5.7 (from requests)
+2026-06-23T11:31:07.0670620Z   Downloading certifi-2026.6.17-py3-none-any.whl.metadata (2.5 kB)
+2026-06-23T11:31:07.0761183Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+2026-06-23T11:31:07.0850550Z Downloading charset_normalizer-3.4.7-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (216 kB)
+2026-06-23T11:31:07.0951835Z Downloading idna-3.18-py3-none-any.whl (65 kB)
+2026-06-23T11:31:07.1016383Z Downloading urllib3-2.7.0-py3-none-any.whl (131 kB)
+2026-06-23T11:31:07.1084450Z Downloading certifi-2026.6.17-py3-none-any.whl (133 kB)
+2026-06-23T11:31:07.1461962Z Installing collected packages: urllib3, idna, charset_normalizer, certifi, requests
+2026-06-23T11:31:07.3403543Z 
+2026-06-23T11:31:07.3419486Z Successfully installed certifi-2026.6.17 charset_normalizer-3.4.7 idna-3.18 requests-2.34.2 urllib3-2.7.0
+2026-06-23T11:31:07.4018572Z ##[group]Run python3 << 'PYEOF'
+2026-06-23T11:31:07.4019036Z [36;1mpython3 << 'PYEOF'[0m
+2026-06-23T11:31:07.4019359Z [36;1mimport requests, json, os[0m
+2026-06-23T11:31:07.4019687Z [36;1m[0m
+2026-06-23T11:31:07.4019964Z [36;1mtoken = os.environ["KAGGLE_TOKEN"][0m
+2026-06-23T11:31:07.4020394Z [36;1musername = os.environ["KAGGLE_USERNAME"][0m
+2026-06-23T11:31:07.4020871Z [36;1mscript_text = os.environ.get("SCRIPT_TEXT", "test")[0m
+2026-06-23T11:31:07.4021337Z [36;1mchat_id = os.environ.get("CHAT_ID", "")[0m
+2026-06-23T11:31:07.4022016Z [36;1mtg_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")[0m
+2026-06-23T11:31:07.4022519Z [36;1mgh_token = os.environ.get("GITHUB_TOKEN_PAYLOAD", "")[0m
+2026-06-23T11:31:07.4023009Z [36;1mgist_id = os.environ.get("GIST_ID_PAYLOAD", "")[0m
+2026-06-23T11:31:07.4023487Z [36;1mvoice_url = os.environ.get("VOICE_URL_PAYLOAD", "")[0m
+2026-06-23T11:31:07.4023892Z [36;1m[0m
+2026-06-23T11:31:07.4024241Z [36;1m# Build the code that Kaggle will run on the GPU[0m
+2026-06-23T11:31:07.4024648Z [36;1mcode = f"""[0m
+2026-06-23T11:31:07.4024916Z [36;1mimport os[0m
+2026-06-23T11:31:07.4025190Z [36;1m# Write input text[0m
+2026-06-23T11:31:07.4025552Z [36;1mwith open("input_text.txt", "w") as f:[0m
+2026-06-23T11:31:07.4025940Z [36;1m    f.write('''{script_text}''')[0m
+2026-06-23T11:31:07.4026543Z [36;1m# Write config[0m
+2026-06-23T11:31:07.4026832Z [36;1mimport json[0m
+2026-06-23T11:31:07.4027549Z [36;1mconfig = {{"telegram_bot_token": "{tg_token}", "telegram_chat_id": "{chat_id}", "github_token": "{gh_token}", "gist_id": "{gist_id}", "voice_url": "{voice_url}"}}[0m
+2026-06-23T11:31:07.4028357Z [36;1mwith open("config.json", "w") as f:[0m
+2026-06-23T11:31:07.4028705Z [36;1m    json.dump(config, f)[0m
+2026-06-23T11:31:07.4029010Z [36;1m# Clone repo and run[0m
+2026-06-23T11:31:07.4029541Z [36;1mos.system("git clone https://github.com/Ale11-tobi/video-factory.git")[0m
+2026-06-23T11:31:07.4030045Z [36;1mos.chdir("video-factory")[0m
+2026-06-23T11:31:07.4030383Z [36;1mos.system("cp ../input_text.txt .")[0m
+2026-06-23T11:31:07.4030735Z [36;1mos.system("cp ../config.json .")[0m
+2026-06-23T11:31:07.4031075Z [36;1mimport subprocess[0m
+2026-06-23T11:31:07.4031341Z [36;1m[0m
+2026-06-23T11:31:07.4031708Z [36;1m# Aggiorna il Gist per avvisare l'utente della compilazione Turbo-Boost[0m
+2026-06-23T11:31:07.4032906Z [36;1mgist_payload = json.dumps({"files": {"progress.json": {"content": json.dumps({"status": "Compilazione Turbo-Boost in corso (TensorRT & xformers). Richiede ~1-2 min...", "progress": 2, "eta": "Compilazione...", "video_url": ""})}}})[0m
+2026-06-23T11:31:07.4034329Z [36;1mrequests.patch(f"https://api.github.com/gists/{gist_id}", headers={"Authorization": f"token {gh_token}"}, data=gist_payload)[0m
+2026-06-23T11:31:07.4034995Z [36;1m[0m
+2026-06-23T11:31:07.4035388Z [36;1msubprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)[0m
+2026-06-23T11:31:07.4035862Z [36;1m[0m
+2026-06-23T11:31:07.4036392Z [36;1m# Aggiorna il Gist post-compilazione[0m
+2026-06-23T11:31:07.4037429Z [36;1mgist_payload_done = json.dumps({"files": {"progress.json": {"content": json.dumps({"status": "Turbo-Boost Attivo! Avvio motore AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""})}}})[0m
+2026-06-23T11:31:07.4038676Z [36;1mrequests.patch(f"https://api.github.com/gists/{gist_id}", headers={"Authorization": f"token {gh_token}"}, data=gist_payload_done)[0m
+2026-06-23T11:31:07.4039345Z [36;1m[0m
+2026-06-23T11:31:07.4039721Z [36;1msubprocess.run(["python", "cli_runner.py", "../input_text.txt"], check=True)[0m
+2026-06-23T11:31:07.4040175Z [36;1m"""[0m
+2026-06-23T11:31:07.4040381Z [36;1m[0m
+2026-06-23T11:31:07.4040831Z [36;1m# Push to Kaggle using *** (new KGAT format)[0m
+2026-06-23T11:31:07.4041171Z [36;1mheaders = {[0m
+2026-06-23T11:31:07.4041470Z [36;1m    "Authorization": f"***",[0m
+2026-06-23T11:31:07.4041804Z [36;1m    "Content-Type": "application/json"[0m
+2026-06-23T11:31:07.4042313Z [36;1m}[0m
+2026-06-23T11:31:07.4042529Z [36;1m[0m
+2026-06-23T11:31:07.4042726Z [36;1mbody = {[0m
+2026-06-23T11:31:07.4043003Z [36;1m    "slug": f"{username}/video-factory-run",[0m
+2026-06-23T11:31:07.4043357Z [36;1m    "newTitle": "Video Factory Run",[0m
+2026-06-23T11:31:07.4043675Z [36;1m    "text": code,[0m
+2026-06-23T11:31:07.4043935Z [36;1m    "language": "python",[0m
+2026-06-23T11:31:07.4044234Z [36;1m    "kernelType": "script",[0m
+2026-06-23T11:31:07.4044531Z [36;1m    "isPrivate": True,[0m
+2026-06-23T11:31:07.4044807Z [36;1m    "enableGpu": True,[0m
+2026-06-23T11:31:07.4045221Z [36;1m    "enableInternet": True,[0m
+2026-06-23T11:31:07.4045529Z [36;1m    "datasetDataSources": [],[0m
+2026-06-23T11:31:07.4045851Z [36;1m    "competitionDataSources": [],[0m
+2026-06-23T11:31:07.4046340Z [36;1m    "kernelDataSources": [],[0m
+2026-06-23T11:31:07.4046645Z [36;1m    "categoryIds": [][0m
+2026-06-23T11:31:07.4046903Z [36;1m}[0m
+2026-06-23T11:31:07.4047103Z [36;1m[0m
+2026-06-23T11:31:07.4047373Z [36;1mprint("Pushing kernel to Kaggle...")[0m
+2026-06-23T11:31:07.4047727Z [36;1mresp = requests.post([0m
+2026-06-23T11:31:07.4048064Z [36;1m    "https://www.kaggle.com/api/v1/kernels/push",[0m
+2026-06-23T11:31:07.4048435Z [36;1m    headers=headers,[0m
+2026-06-23T11:31:07.4048697Z [36;1m    json=body[0m
+2026-06-23T11:31:07.4048930Z [36;1m)[0m
+2026-06-23T11:31:07.4049163Z [36;1mprint(f"Status: {resp.status_code}")[0m
+2026-06-23T11:31:07.4049502Z [36;1mprint(f"Response: {resp.text}")[0m
+2026-06-23T11:31:07.4049789Z [36;1m[0m
+2026-06-23T11:31:07.4050007Z [36;1mif resp.status_code != 200:[0m
+2026-06-23T11:31:07.4050485Z [36;1m    raise Exception(f"Kaggle push failed with status {resp.status_code}: {resp.text}")[0m
+2026-06-23T11:31:07.4050972Z [36;1m[0m
+2026-06-23T11:31:07.4051211Z [36;1mprint("Kernel pushed successfully!")[0m
+2026-06-23T11:31:07.4051525Z [36;1mPYEOF[0m
+2026-06-23T11:31:07.4085838Z shell: /usr/bin/bash -e {0}
+2026-06-23T11:31:07.4086490Z env:
+2026-06-23T11:31:07.4086812Z   pythonLocation: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:07.4087338Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.10.20/x64/lib/pkgconfig
+2026-06-23T11:31:07.4087842Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:07.4088295Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:07.4088750Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.20/x64
+2026-06-23T11:31:07.4089220Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.10.20/x64/lib
+2026-06-23T11:31:07.4089717Z   KAGGLE_TOKEN: ***
+2026-06-23T11:31:07.4089993Z   KAGGLE_USERNAME: ***
+2026-06-23T11:31:07.4090368Z   TELEGRAM_BOT_TOKEN: ***
+2026-06-23T11:31:07.4124087Z   SCRIPT_TEXT: 
+[ADVANCED_CONFIG]
+Ticket_ID: #TITAN_AJ9PB
+Mode: ð Mode A: Da Testo a Video
+Format: ð¥ï¸ 16:9 (YouTube/TV)
+Style: ð¥ Cinematico (Pellicola 35mm)
+MegaSubs: False
+Avatar_Prompt: 
+Avatar_Export: Integra nel Video Finale
+Use_3D: False
+Smart_3D: False
+Prompt_3D: None
+Pos_3D: Intelligente
+Export_3D: Integra nel Video Finale
+Asset_Export: Integra nel Video Finale
+[/ADVANCED_CONFIG]
+
+[0:00 - 1:00] L'INTRODUZIONE (Il Gancio)
+[VISUALE: Grafica 3D di un asteroide gigantesco che si avvicina alla Terra, scritte dorate con cifre enormi che girano sullo schermo. Musica tesa e incalzante.]
+
+VOCE FUORI CAMPO (o TU in camera, serio ed entusiasta):
+Immagina un pezzo di roccia che fluttua nello spazio profondo. Non Ã¨ molto grande, forse quanto una grande cittÃ . Ma câÃ¨ un dettaglio: quella roccia Ã¨ composta interamente da oro, platino, ferro e nichel. E il suo valore stimato Ã¨ di circa 10.000 quadriliardi di dollari. SÃ¬, hai sentito bene. Abbastanza soldi da rendere ogni singolo essere umano sulla Terra un miliardario istantaneo, o da far collassare lâintera economia globale in un secondo.
+
+[VISUALE: Taglio rapido. Immagini di Elon Musk, loghi della NASA, bandiere di USA e Cina.]
+
+Questo non Ã¨ il riassunto di un film di fantascienza alla Don't Look Up. Questa Ã¨ la realtÃ  dei fatti nel 2026. Mentre noi siamo qui a preoccuparci dell'inflazione e delle risorse che finiscono sul nostro pianeta, lassÃ¹ Ã¨ appena iniziata la corsa all'oro piÃ¹ spietata, folle e ricca della storia dell'umanitÃ . Chi arriverÃ  primo non sarÃ  semplicemente il piÃ¹ ricco del mondo... sarÃ  il primo Trilionario della storia.
+
+In questo video vedremo come funziona la corsa mineraria spaziale, quali sono gli asteroidi nel mirino e perchÃ© l'umanitÃ  sta per cambiare per sempre. Lascia un bel mi piace, iscriviti per non perderti i prossimi viaggi nel futuro, e iniziamo.
+
+[1:00 - 3:00] IL TESORO NASCOSTO: Cos'Ã¨ Psyche 16?
+[VISUALE: Cambio musica, atmosfera piÃ¹ misteriosa e scientifica. Mappa del sistema solare che zooma sulla fascia principale degli asteroidi tra Marte e Giove.]
+
+VOCE FUORI CAMPO:
+Per capire di cosa stiamo parlando, dobbiamo fare un nome: 16 Psyche. Ã uno degli asteroidi piÃ¹ massicci della fascia principale e la NASA ci ha letteralmente mandato una sonda per studiarlo da vicino. A differenza della maggior parte degli asteroidi, che sono fatti di roccia o ghiaccio, Psyche sembra essere il nucleo metallico esposto di un antico pianeta fallito.
+
+[VISUALE: Grafica con i dati dell'asteroide. Tabella comparativa del valore dei materiali.]
+
+Gli scienziati stimano che sia composto per la maggior parte di ferro, nichel e metalli rari come il platino e l'oro. Se potessimo portarlo sulla Terra, il suo valore distruggerebbe il mercato della transizione ecologica.
+
+Ma il platino e l'oro sono solo la punta dell'iceberg. C'Ã¨ qualcosa di molto meno "sexy" dell'oro, ma che nello spazio vale molto di piÃ¹: l'acqua.
+
+Molti asteroidi sono ricchi di ghiaccio d'acqua. E l'acqua nello spazio significa due cose: vita per gli astronauti e, soprattutto, carburante per i razzi. Separando l'idrogeno dall'ossigeno, ottieni il propellente per andare ovunque nel sistema solare. Gli asteroidi non saranno solo miniere, saranno le "stazioni di servizio" del futuro. Senza di loro, colonizzare Marte o andare oltre rimarrÃ  un sogno irraggiungibile.
+
+[3:00 - 5:30] COME SI FA? (La Tecnologia)
+[VISUALE: Animazioni 3D futuristiche o concept art di trivelle spaziali, magneti giganti e robot che scavano sulla superficie di un asteroide.]
+
+VOCE FUORI CAMPO:
+Ok, tutto bellissimo. Ma come si scava su un asteroide? Non puoi mandare un gruppo di minatori con il piccone in stile Armageddon. La gravitÃ  su questi corpi celesti Ã¨ quasi inesistente. Se dai un colpo di piccone, la forza di reazione ti spinge nello spazio profondo.
+
+Le aziende e le agenzie spaziali stanno studiando tre metodi principali, ognuno piÃ¹ assurdo dell'altro.
+
+Metodo 1: Il magnetismo e le frese ancorate. Le trivelle dovranno letteralmente "artigliarsi" all'asteroide o usare magneti giganti per rimanere attaccate alla superficie mentre scavano il materiale.
+
+Metodo 2: Il riscaldamento solare. Usare specchi giganti per concentrare la luce del sole su un punto dell'asteroide, vaporizzando la roccia e catturando i gas e i materiali rari rilasciati.
+
+Metodo 3: Il "Rattoppo". Questa Ã¨ l'idea piÃ¹ folle, ma incredibilmente al vaglio: avvolgere letteralmente i piccoli asteroidi in giganteschi sacchi o capsule di contenimento per evitare che i frammenti volino via durante la frantumazione.
+
+[VISUALE: Scritta a schermo gigante: "MA QUANTO COSTA?"]
+
+Il problema non Ã¨ solo come scavare, ma dove lavorare i materiali. Portare tonnellate di ferro grezzo sulla Terra non ha senso economico: costerebbe piÃ¹ il viaggio del guadagno. La vera svolta sarÃ  la manifattura nello spazio. Raffinare i metalli direttamente in orbita utilizzando la stampa 3D a gravitÃ  zero per costruire le astronavi del futuro direttamente lassÃ¹.
+
+[5:30 - 8:00] LA GEOPOLITICA E LE LEGGI DELLO SPAZIO: Di chi Ã¨ l'Universo?
+[VISUALE: Immagini tese. Schermi divisi con i leader mondiali, lanci di razzi militari, simulazioni di conflitti.]
+
+VOCE FUORI CAMPO:
+Qui entriamo nella parte piÃ¹ calda della vicenda. Se io arrivo su un asteroide e ci pianto la mia bandiera, quell'oro Ã¨ mio?
+
+Nel 1967 Ã¨ stato firmato il Trattato sullo Spazio Esterno, che dice chiaramente che nessuna nazione puÃ² rivendicare la sovranitÃ  su un corpo celeste. Lo spazio Ã¨ di tutti. Bellissimo, pacifico... e totalmente superato.
+
+Negli ultimi anni, gli Stati Uniti hanno firmato gli Accordi Artemis, seguiti da leggi interne come il Commercial Space Launch Competitiveness Act. Cosa dicono in sostanza? "Ok, non puoi possedere l'asteroide, ma se riesci a estrarre le sue risorse, quelle risorse diventano legalmente tue". Ã la legge del West applicata al cosmo.
+
+[VISUALE: Focus sulla Cina e sulle startup private.]
+
+E la Cina non sta a guardare. Pechino ha piani aggressivi per l'esplorazione degli asteroidi vicini alla Terra e punta a diventare la superpotenza mineraria dello spazio entro i prossimi due decenni. Siamo di fronte a una vera e propria colonizzazione commerciale. Se una sola nazione o, peggio, una sola mega-corporazione privata (immaginate SpaceX o una futura compagnia mineraria) dovesse ottenere il monopolio di questi materiali, avrebbe in mano il destino economico della Terra. Potrebbe decidere il prezzo di ogni tecnologia sul nostro pianeta.
+
+[8:00 - 9:30] I RISCHI: Il collasso dell'economia
+[VISUALE: Musica drammatica. Grafici finanziari che crollano. Immagini di borse valori nel caos.]
+
+VOCE FUORI CAMPO:
+Ma c'Ã¨ un paradosso in tutta questa ricchezza. Ã la legge fondamentale dell'economia: la domanda e l'offerta.
+
+PerchÃ© il platino costa cosÃ¬ tanto? PerchÃ© Ã¨ raro. Se domani mattina una nave spaziale tornasse sulla Terra con 50 tonnellate di platino puro, la raritÃ  svanirebbe. Il prezzo del platino crollerebbe a zero.
+
+Quindi, l'abbondanza estrema dello spazio potrebbe paradossalmente distruggere le industrie minerarie terrestri e mandare in bancarotta interi paesi che basano la loro economia sull'esportazione di questi materiali.
+
+Diventeremo tutti ricchi? No. Probabilmente assisteremo a una redistribuzione del potere geopolitico globale mai vista prima. Chi controlla lo spazio, controllerÃ  la ricchezza. Chi resta a terra, rimarrÃ  indietro per sempre.
+
+[9:30 - 10:00] CONCLUSIONE (La Call to Action)
+[VISUALE: Musica che sale di intensitÃ , immagini spettacolari della Terra vista dallo spazio con la Luna sullo sfondo. Ritorno in camera su di te.]
+
+VOCE FUORI CAMPO / TU:
+La corsa all'oro spaziale non Ã¨ una questione di se, ma di quando. Le tecnologie si stanno evolvendo rapidamente, i capitali privati stanno orbitando intorno a queste idee e i primi test di trivellazione robotica sono giÃ  pianificati per i prossimi anni.
+
+La vera domanda che dobbiamo porci Ã¨: questa incredibile ricchezza servirÃ  a salvare il nostro pianeta, spostando le industrie inquinanti fuori dall'atmosfera, o sarÃ  solo l'ennesimo motivo per far scoppiare una guerra, questa volta tra le stelle?
+
+Voglio sapere cosa ne pensate voi. Se aveste la possibilitÃ  di investire in una compagnia mineraria spaziale oggi, lo fareste o pensate che sia tutta una gigantesca bolla? Fatemelo sapere qui sotto nei commenti.
+
+Se il video vi Ã¨ piaciuto lasciate un bel like, iscrivetevi al canale e attivate la campanella per non perdervi i prossimi video. Noi ci vediamo alla prossima... nello spazio!
+
+[VISUALE: Schermata finale con i video consigliati e il bottone per iscriversi. Musica sfumata.]
+
+2026-06-23T11:31:07.4155028Z   CHAT_ID: 6810865157
+2026-06-23T11:31:07.4155429Z   GITHUB_TOKEN_PAYLOAD: ***
+2026-06-23T11:31:07.4155738Z   GIST_ID_PAYLOAD: a8a3de218a1e5f5d26a85df78c3875e7
+2026-06-23T11:31:07.4156286Z   VOICE_URL_PAYLOAD: 
+2026-06-23T11:31:07.4156634Z ##[endgroup]
+2026-06-23T11:31:07.4314925Z   File "<stdin>", line 41
+2026-06-23T11:31:07.4315645Z     """
+2026-06-23T11:31:07.4316322Z        ^
+2026-06-23T11:31:07.4316984Z SyntaxError: f-string: expressions nested too deeply
+2026-06-23T11:31:07.4349347Z ##[error]Process completed with exit code 1.
+2026-06-23T11:31:07.4548021Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+2026-06-23T11:31:07.4549442Z Post job cleanup.
+2026-06-23T11:31:07.5418428Z [command]/usr/bin/git version
+2026-06-23T11:31:07.5455528Z git version 2.54.0
+2026-06-23T11:31:07.5493907Z Temporarily overriding HOME='/home/runner/work/_temp/997a38c1-5d5d-41c0-bea8-8581b0dcf218' before making global git config changes
+2026-06-23T11:31:07.5495418Z Adding repository directory to the temporary git global config as a safe directory
+2026-06-23T11:31:07.5499816Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/video-factory/video-factory
+2026-06-23T11:31:07.5538539Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-06-23T11:31:07.5574182Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-06-23T11:31:07.5805445Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-06-23T11:31:07.5833038Z http.https://github.com/.extraheader
+2026-06-23T11:31:07.5845154Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-06-23T11:31:07.5877442Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-06-23T11:31:07.6108653Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-06-23T11:31:07.6142231Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-06-23T11:31:07.6497387Z Cleaning up orphan processes
+2026-06-23T11:31:07.6773511Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-python@v5. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
