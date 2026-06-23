@@ -10,6 +10,9 @@ import string
 # --- 1. CONFIGURAZIONE PAGINA ---
 st.set_page_config(page_title="Ale's Editor", page_icon="🎬", layout="wide", initial_sidebar_state="expanded")
 
+if "is_running" not in st.session_state:
+    st.session_state.is_running = False
+
 # --- 2. CSS SPAZIALE (Glassmorphism & Neon) ---
 st.markdown("""
     <style>
