@@ -60,18 +60,24 @@ jobs:
           os.system("cp ../config.json .")
           import subprocess
           import requests
+          import traceback
           
-          # Aggiorna il Gist per avvisare l'utente della compilazione Turbo-Boost
-          gist_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Compilazione Turbo-Boost in corso (TensorRT). Richiede ~1 min...", "progress": 2, "eta": "Compilazione...", "video_url": ""}})}}}}}})
-          requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload)
-          
-          subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)
-          
-          # Aggiorna il Gist post-compilazione
-          gist_payload_done = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Turbo-Boost Attivo! Avvio motore AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""}})}}}}}})
-          requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload_done)
-          
-          subprocess.run(["python", "cli_runner.py", "../input_text.txt"], check=True)
+          try:
+              # Aggiorna il Gist per avvisare l'utente della compilazione Turbo-Boost
+              gist_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Installazione Motore Veloce in corso. Richiede ~30 sec...", "progress": 2, "eta": "Installazione...", "video_url": ""}})}}}}}})
+              requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload)
+              
+              subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True)
+              
+              # Aggiorna il Gist post-compilazione
+              gist_payload_done = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Turbo-Boost Attivo! Avvio motore AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""}})}}}}}})
+              requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload_done)
+              
+              subprocess.run(["python", "cli_runner.py", "../input_text.txt"], check=True)
+          except Exception as e:
+              error_msg = f"Errore CRITICO su Kaggle: {{str(e)}}. Traceback: {{traceback.format_exc()}}"
+              err_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": error_msg, "progress": -1, "eta": "Errore", "video_url": ""}})}}}}}})
+              requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=err_payload)
           """
 
           # Push to Kaggle using Bearer token (new KGAT format)

@@ -8,5 +8,4 @@ TTS
 torch
 torchaudio
 accelerate
-tensorrt
 bitsandbytes
