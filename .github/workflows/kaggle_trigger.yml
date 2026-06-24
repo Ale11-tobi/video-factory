@@ -71,7 +71,7 @@ jobs:
                   subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True, capture_output=True, text=True)
               except subprocess.CalledProcessError as e:
                   err = e.stderr if e.stderr else e.stdout
-                  raise RuntimeError(f"Pip error: {err[-1000:]}")
+                  raise RuntimeError(f"Pip error: {{err[-1000:]}}")
               
               # Aggiorna il Gist post-compilazione
               gist_payload_done = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Turbo-Boost Attivo! Avvio motore AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""}})}}}}}})
