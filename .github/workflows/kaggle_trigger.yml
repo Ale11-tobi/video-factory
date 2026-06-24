@@ -63,21 +63,23 @@ jobs:
           import traceback
           
           try:
-              # Aggiorna il Gist per avvisare l'utente della compilazione Turbo-Boost
-              gist_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Installazione Motore Veloce in corso. Richiede ~30 sec...", "progress": 2, "eta": "Installazione...", "video_url": ""}})}}}}}})
+              # Aggiorna il Gist per avvisare l'utente della compilazione
+              gist_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Download ambiente Python 3.10 isolato (per bypassare Kaggle 3.12). Richiede ~2 min...", "progress": 2, "eta": "Installazione...", "video_url": ""}})}}}}}})
               requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload)
               
               try:
-                  subprocess.run(["pip", "install", "-r", "requirements_kaggle.txt"], check=True, capture_output=True, text=True)
+                  subprocess.run(["pip", "install", "uv"], check=True, capture_output=True, text=True)
+                  subprocess.run(["uv", "venv", "--python", "3.10", ".venv"], check=True, capture_output=True, text=True)
+                  subprocess.run(["uv", "pip", "install", "-r", "requirements_kaggle.txt"], check=True, capture_output=True, text=True)
               except subprocess.CalledProcessError as e:
                   err = e.stderr if e.stderr else e.stdout
-                  raise RuntimeError(f"Pip error: {{err[-1000:]}}")
+                  raise RuntimeError(f"Pip/UV error: {{err[-1000:]}}")
               
               # Aggiorna il Gist post-compilazione
-              gist_payload_done = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Turbo-Boost Attivo! Avvio motore AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""}})}}}}}})
+              gist_payload_done = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": "Motore Python 3.10 Attivo! Avvio AI...", "progress": 5, "eta": "Calcolo in corso...", "video_url": ""}})}}}}}})
               requests.patch("https://api.github.com/gists/" + config["gist_id"], headers={{"Authorization": "token " + config["github_token"]}}, data=gist_payload_done)
               
-              subprocess.run(["python", "cli_runner.py", "../input_text.txt"], check=True)
+              subprocess.run([".venv/bin/python", "cli_runner.py", "../input_text.txt"], check=True)
           except Exception as e:
               error_msg = f"Errore CRITICO su Kaggle: {{str(e)}}. Traceback: {{traceback.format_exc()}}"
               err_payload = json.dumps({{"files": {{"progress.json": {{"content": json.dumps({{"status": error_msg, "progress": -1, "eta": "Errore", "video_url": ""}})}}}}}})
