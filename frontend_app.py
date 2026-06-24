@@ -431,9 +431,15 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
                                 if "progress.json" in files:
                                     content = files["progress.json"]["content"]
                                     p_data = json.loads(content)
-                                    prog_bar.progress(int(p_data.get("progress", 0)))
-                                    status_text.markdown(f"**Stato:** {p_data.get('status', '')}")
-                                    eta_text.markdown(f"⏳ **Tempo Stimato:** {p_data.get('eta', '')}")
+                                    progress_val = int(p_data.get("progress", 0))
+                                    if progress_val < 0:
+                                        st.session_state.is_running = False
+                                        status_text.error(f"**ERRORE CRITICO:** {p_data.get('status', '')}")
+                                        break
+                                    else:
+                                        prog_bar.progress(progress_val)
+                                        status_text.markdown(f"**Stato:** {p_data.get('status', '')}")
+                                        eta_text.markdown(f"⏳ **Tempo Stimato:** {p_data.get('eta', '')}")
                                     
                                     if p_data.get("video_url"):
                                         st.session_state.is_running = False
