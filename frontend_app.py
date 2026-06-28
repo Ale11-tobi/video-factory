@@ -262,12 +262,10 @@ st.sidebar.markdown("Il sito è la vetrina. Kaggle è il motore.")
 st.sidebar.markdown("---")
 st.sidebar.markdown("🔑 **Credenziali Cloud**")
 
-# Leggiamo il secret (se esiste) come default, altrimenti usiamo quello hardcoded per comodità
+# Token precaricato per bypassare qualsiasi errore di configurazione manuale
 default_token = "ghp_2PdPOv0Gvs" + "tArDjSumJPpFXqgwsUY62xOOXG"
-st.sidebar.success("✅ Token GitHub precaricato (Hardcoded)")
-
-# Permettiamo sempre di sovrascriverlo a mano in caso il secret cloud sia scaduto
-sidebar_gh_token = st.sidebar.text_input("GitHub Token (incollalo qui se quello di sistema non va)", value=default_token, type="password")
+st.sidebar.success("✅ Sistema sbloccato! Token automatico attivo.")
+sidebar_gh_token = ""
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("🎙️ **Clonazione Vocale (Opzionale)**")
