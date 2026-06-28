@@ -331,7 +331,8 @@ Asset_Export: {asset_export if 'asset_export' in locals() else 'Integra nel Vide
 {st.session_state.user_text}
 """
             
-            GITHUB_TOKEN = sidebar_gh_token
+            # Recupera Token dalla Sidebar o usa default e pulisci spazi vuoti
+            GITHUB_TOKEN = (sidebar_gh_token if sidebar_gh_token else default_token).strip()
             if not GITHUB_TOKEN:
                 st.error("⚠️ Token GitHub mancante! Inseriscilo nella barra laterale a sinistra.")
                 st.stop()
